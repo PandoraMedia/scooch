@@ -19,7 +19,7 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'Congigipy'
+project = 'Configipy'
 copyright = '2020, Matt C. McCallum'
 author = 'Matt C. McCallum'
 
