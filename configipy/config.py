@@ -86,8 +86,8 @@ class Config(dict):
         else:
             raise KeyError('No inheritable attribute "{}" found in Configipy heirarchy'.format(term))
 
-    @staticmethod
-    def _datetime(heirarchy, term, value):
+    @classmethod
+    def _datetime(cls, heirarchy, term, value):
         """
         Macro function to insert a datetime substring into the variable.
 
