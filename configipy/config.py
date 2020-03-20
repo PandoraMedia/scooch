@@ -17,6 +17,13 @@ import re
 from datetime import datetime
 
 
+# NOTE [matt.c.mccallum 03.19.20]: The below constant is evaluated at module import time and
+#      is required because datetime objects have trouble being pickled and sent to other machines
+#      with other clock systems. The constant, evaluated at module import time, however, can
+#      be pickled and distributed.
+CURRENT_DATETIME = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+
 class Config(dict):
     """
     A simple class that encapsulates feature configuration files stored in yaml format.
@@ -102,7 +109,7 @@ class Config(dict):
         Return:
             value: str - The provided value with the macro expression evaluated.
         """
-        value = value.replace(r'${datetime}', datetime.now().strftime("%Y%m%d_%H%M%S"))
+        value = value.replace(r'${datetime}', CURRENT_DATETIME)
         return value
 
     def _evaluate_macro(self, heirarchy, term, value):

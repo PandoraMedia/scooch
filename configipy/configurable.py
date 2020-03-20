@@ -32,6 +32,10 @@ class Configurable(object):
     It is assumed that values further down the heirarchy are for configuration of other objects and it is
     up to the derived class to use these values.
     """
+
+    # TODO [matt.c.mccallum 03.11.20]: Make it easier to extend the below two variables across several layers of class heirarchy
+    # TODO [matt.c.mccallum 03.11.20]: Automatically instantiate any 'cfg' element as a member variable that is also a Configurable
+    # TODO [matt.c.mccallum 03.11.20]: Allow a Configurable `cfg` element to have a specific type that it must be a subclass of
     
     _REQUIRED_CONFIG = []   # <= Parameters that must be specified in the class configuration every time
 
