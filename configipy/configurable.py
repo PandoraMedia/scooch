@@ -13,13 +13,6 @@ Created 06-17-18 by Matt C. McCallum
 import copy
 
 
-class InvalidConfigError(Exception):
-    """
-    An error that is raised when the required configuration fields are not provided.
-    """
-    pass
-
-
 class Configurable(object):
     """
     A Base class for any object that has a given configuration, i.e., requires a certain set of parameters.
@@ -111,12 +104,10 @@ class Configurable(object):
             if isinstance(field, dict):
                 for key in field.keys():
                     if key not in cfg.keys():
-                        print(key + " value not found in " + self.__class__.__name__ + " object configuration")
-                        raise InvalidConfigError
+                        raise ValueError("Configipy config error: " + key + " value not found in " + self.__class__.__name__ + " object configuration")
                     self._verifyConfig(cfg[key], field[key])
             elif field not in cfg.keys():
-                print(field + " value not found in " + self.__class__.__name__ + " object configuration")
-                raise InvalidConfigError
+                raise ValueError("Configipy config error: " + field + " value not found in " + self.__class__.__name__ + " object configuration")
 
     @property
     def cfg(self):

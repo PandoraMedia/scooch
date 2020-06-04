@@ -47,9 +47,9 @@ def class_for_config(base_class, config):
     config_fields = config.keys()
     matching_classes = [c_field for c_field in config_fields if c_field in feature_class_names]
     if not len(matching_classes):
-        print(feature_class_names)
-        print(config_fields)
-        raise KeyError('Provided configuration does not match any, or matches multiple classes in the provided module')
+        raise KeyError('Provided configuration does not match any, or matches multiple classes in the provided module\n \
+                        Candidates were: {}\n \
+                        Config requested: {}'.format(str(feature_class_names), str(config_fields)))
 
     # Get all matching classes
     f_classes = [fclsses[feature_class_names.index(match_cls)] for match_cls in matching_classes]
