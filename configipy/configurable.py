@@ -4,7 +4,7 @@ Created 06-17-18 by Matt C. McCallum
 
 
 # Local imports
-# None.
+from .config_meta import ConfigMeta
 
 # Third party module imports
 # None.
@@ -13,7 +13,7 @@ Created 06-17-18 by Matt C. McCallum
 import copy
 
 
-class Configurable(object):
+class Configurable(object, metaclass=ConfigMeta):
     """
     A Base class for any object that has a given configuration, i.e., requires a certain set of parameters.
 
@@ -30,9 +30,9 @@ class Configurable(object):
     # TODO [matt.c.mccallum 03.11.20]: Automatically instantiate any 'cfg' element as a member variable that is also a Configurable
     # TODO [matt.c.mccallum 03.11.20]: Allow a Configurable `cfg` element to have a specific type that it must be a subclass of
     
-    _REQUIRED_CONFIG = []   # <= Parameters that must be specified in the class configuration every time
+    __PARAMS__ = {} # <= Parameters that must be specified in the class configuration
 
-    _CONFIG_DEFAULTS = {}   # <= Parameters that are optional, and if not provided, will assume default values
+    __PARAM_DEFAULTS__ = {}   # <= Parameters that are optional, and if not provided, will assume default values
 
     def __init__(self, cfg):
         """
@@ -47,14 +47,16 @@ class Configurable(object):
             # Save configuration dictionary
             self._cfg = cfg
 
+        required_config = list(self.__PARAMS__.keys())
+
         # Populate defaults
-        self._populateDefaults(self._cfg[self.__class__.__name__], self._CONFIG_DEFAULTS)
+        self._populateDefaults(self._cfg[self.__class__.__name__], self.__PARAM_DEFAULTS__)
 
         # Verify configuration
-        self._verifyConfig(self._cfg[self.__class__.__name__], self._REQUIRED_CONFIG)
+        self._verifyConfig(self._cfg[self.__class__.__name__], required_config)
 
         # Set properties
-        total_config = self._REQUIRED_CONFIG + list(self._CONFIG_DEFAULTS.keys())
+        total_config = required_config + list(self.__PARAM_DEFAULTS__.keys())
         for name in total_config:
             if type(name) is str:
                 setattr(self, "_"+name, self._cfg[self.__class__.__name__][name])

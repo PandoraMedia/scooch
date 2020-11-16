@@ -47,7 +47,7 @@ setuptools.setup(
         'make_reqs': MakeReqsCommand
     },
     name='configipy',
-    version='0.0.3',
+    version='0.0.4',
     description='A python module for configuring hierarchical class structures in yaml with defaults',
     install_requires=REQUIRED_PACKAGES,
     packages=setuptools.find_packages()
