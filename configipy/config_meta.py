@@ -31,16 +31,9 @@ class ConfigMeta(type):
         meta_bases = [base for base in bases if type(base) is ConfigMeta]
 
         # Collect all params from base classes
-        params = {k:v for base in meta_bases for k, v in base.__PARAMS__.items()}
-        if '__PARAMS__' in attrs.keys():
-            params = {**params, **attrs['__PARAMS__']}
-        attrs['__PARAMS__'] = params
-
-        # Collect all defaults from base classes
-        default_params = {k:v for base in meta_bases for k, v in base.__PARAM_DEFAULTS__.items()}
-        if '__PARAM_DEFAULTS__' in attrs.keys():
-            default_params = {**default_params, **attrs['__PARAM_DEFAULTS__']}
-        attrs['__PARAM_DEFAULTS__'] = default_params
+        cls._collect_param_from_bases(meta_bases, attrs, '__PARAMS__')
+        cls._collect_param_from_bases(meta_bases, attrs, '__PARAM_DEFAULTS__')
+        cls._collect_param_from_bases(meta_bases, attrs, '__CONFIGURABLES__')
 
         # Update the docs
         if len(list(attrs['__PARAMS__'].keys())):
@@ -65,3 +58,24 @@ class ConfigMeta(type):
             attrs['__doc__'] += doc_addition
 
         return super(ConfigMeta, cls).__new__(cls, name, bases, attrs)
+
+    @staticmethod
+    def _collect_param_from_bases(meta_bases, attrs, param_name):
+        """
+        Collects a parameter from the attributes of all the provided base classes.
+
+        Args:
+            meta_bases: list(Configurable) - A list of base classes from which to collect the parameters.
+            This is to be provided in order of inheritance.
+
+            attrs: dict - A dictionary of all attributes for this class that inherits the provided bases.
+
+            param_name: str - The name of the parameter to collect across all provided base classes.
+        """
+        # Reverse list here to respect the python method resolution order (MRO) in any comprehension statements.
+        meta_bases = metabases[::-1]
+        # Collect the params.
+        params = {k:v for base in meta_bases for k, v in base.__dict__[param_name].items()}
+        if param_name in attrs.keys():
+            params = {**params, **attrs[param_name]}
+        attrs[param_name] = params
