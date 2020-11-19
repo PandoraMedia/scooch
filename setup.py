@@ -50,5 +50,6 @@ setuptools.setup(
     version='0.0.4',
     description='A python module for configuring hierarchical class structures in yaml with defaults',
     install_requires=REQUIRED_PACKAGES,
+    python_requires='>=3.5',
     packages=setuptools.find_packages()
 )
