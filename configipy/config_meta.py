@@ -33,7 +33,6 @@ class ConfigMeta(type):
         # Collect all params from base classes
         cls._collect_param_from_bases(meta_bases, attrs, '__PARAMS__')
         cls._collect_param_from_bases(meta_bases, attrs, '__PARAM_DEFAULTS__')
-        cls._collect_param_from_bases(meta_bases, attrs, '__CONFIGURABLES__')
 
         # Update the docs
         if len(list(attrs['__PARAMS__'].keys())):
