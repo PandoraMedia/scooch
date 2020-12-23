@@ -5,6 +5,8 @@ Created 06-17-18 by Matt C. McCallum
 
 # Local imports
 from .config_meta import ConfigMeta
+from .helper_funcs import class_instance_for_config
+from .config import Config
 
 # Third party module imports
 # None.
@@ -25,14 +27,12 @@ class Configurable(object, metaclass=ConfigMeta):
     It is assumed that values further down the heirarchy are for configuration of other objects and it is
     up to the derived class to use these values.
     """
-
-    # TODO [matt.c.mccallum 03.11.20]: Make it easier to extend the below two variables across several layers of class heirarchy
-    # TODO [matt.c.mccallum 03.11.20]: Automatically instantiate any 'cfg' element as a member variable that is also a Configurable
-    # TODO [matt.c.mccallum 03.11.20]: Allow a Configurable `cfg` element to have a specific type that it must be a subclass of
     
     __PARAMS__ = {} # <= Parameters that must be specified in the class configuration
 
-    __PARAM_DEFAULTS__ = {}   # <= Parameters that are optional, and if not provided, will assume default values
+    __CONFIGURABLES__ = {} # <= Parameters that at Configipy configurables and will be constructed according to the configuration dicts specified in the Config
+
+    __PARAM_DEFAULTS__ = {} # <= Parameters that are optional, and if not provided, will assume default values
 
     def __init__(self, cfg):
         """
@@ -53,27 +53,20 @@ class Configurable(object, metaclass=ConfigMeta):
         self._populateDefaults(self._cfg[self.__class__.__name__], self.__PARAM_DEFAULTS__)
 
         # Verify configuration
+        # NOTE [matt.c.mccallum 12.16.20]: Just do this for this configurable, all sub-configurables will be verified upon their construction, respectively.
         self._verifyConfig(self._cfg[self.__class__.__name__], required_config)
 
         # Set properties
-        total_config = required_config + list(self.__PARAM_DEFAULTS__.keys())
-        for name in total_config:
+        param_config = [it for it in self.__PARAMS__.keys() if it not in list(self.__CONFIGURABLES__.keys())]
+        for name in param_config:
             if type(name) is str:
                 setattr(self, "_"+name, self._cfg[self.__class__.__name__][name])
 
-    @classmethod
-    def GetSubclasses(cls):
-        """
-        Get all subclasses for this class and place them in a dictionary for indexing and constructing classes from.
-
-        Return:
-            dict - A dictionary mapping class names to classes for all current subclasses of this class.
-        """
-        all_subclasses = []
-        for subclass in cls.__subclasses__():
-            all_subclasses.append(subclass)
-            all_subclasses.extend(subclass._getSubclassNames())
-        return {subcls.__name__: subcls for subcls in all_subclasses}
+        # Construct configurables
+        for param_name, configurable in self.__CONFIGURABLES__.items():
+            cfg = Config(self._cfg[self.__class__.__name__][param_name])
+            setattr(self, "_"+param_name+"_cfg", cfg)
+            setattr(self, "_"+param_name, class_instance_for_config(configurable, cfg))
 
     def _populateDefaults(self, cfg, defaults):
         """

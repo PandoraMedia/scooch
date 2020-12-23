@@ -33,6 +33,7 @@ class ConfigMeta(type):
         # Collect all params from base classes
         cls._collect_param_from_bases(meta_bases, attrs, '__PARAMS__')
         cls._collect_param_from_bases(meta_bases, attrs, '__PARAM_DEFAULTS__')
+        cls._collect_param_from_bases(meta_bases, attrs, '__CONFIGURABLES__')
 
         # Update the docs
         if len(list(attrs['__PARAMS__'].keys())):
@@ -42,7 +43,9 @@ class ConfigMeta(type):
             """), '    ')
 
         for param, doc in attrs['__PARAMS__'].items():
-            if param in list(attrs['__PARAM_DEFAULTS__'].keys()):
+            if param in list(attrs['__CONFIGURABLES__'].keys()):
+                default_info = f" (This parameter is a Configurable: {attrs['__CONFIGURABLES__'][param].__class__.__name__})"
+            elif param in list(attrs['__PARAM_DEFAULTS__'].keys()):
                 param_value = attrs['__PARAM_DEFAULTS__'][param]
                 if '\n' in str(param_value) or len(str(param_value)) > 40:
                     param_value = f" (Default is of type {type(param_value)})"
@@ -50,11 +53,10 @@ class ConfigMeta(type):
                     default_info = f" (Default: {attrs['__PARAM_DEFAULTS__'][param]})"
             else:
                 default_info = ""
-            doc_addition = textwrap.indent(textwrap.dedent(f"""
-            **{param}**{default_info}:
-                {textwrap.fill(doc, 400)}
-            """), '    ')
-            attrs['__doc__'] += doc_addition
+            attrs['__doc__'] += textwrap.indent(textwrap.dedent(f"""
+                                                **{param}**{default_info}:
+                                                    {textwrap.fill(doc, 400)}
+                                                """), '    ')
 
         return super(ConfigMeta, cls).__new__(cls, name, bases, attrs)
 
@@ -72,7 +74,7 @@ class ConfigMeta(type):
             param_name: str - The name of the parameter to collect across all provided base classes.
         """
         # Reverse list here to respect the python method resolution order (MRO) in any comprehension statements.
-        meta_bases = metabases[::-1]
+        meta_bases = meta_bases[::-1]
         # Collect the params.
         params = {k:v for base in meta_bases for k, v in base.__dict__[param_name].items()}
         if param_name in attrs.keys():
