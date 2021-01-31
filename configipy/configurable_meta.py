@@ -13,7 +13,7 @@ Created 11-13-20 by Matt C. McCallum
 import textwrap
 
 
-class ConfigMeta(type):
+class ConfigurableMeta(type):
     """
     Metaclass for configipy configurables. Enables programmatic modification
     to the classes for things like programmatic class documentation.
@@ -27,8 +27,8 @@ class ConfigMeta(type):
             - Collects all parameters and parameter defaults through the Configurable inheretence hierarchy
             - Updates the class doc string with information on its configipy parameters
         """
-        # Get all base classes that are also ConfigMeta types
-        meta_bases = [base for base in bases if type(base) is ConfigMeta]
+        # Get all base classes that are also ConfigurableMeta types
+        meta_bases = [base for base in bases if type(base) is ConfigurableMeta]
 
         # Collect all params from base classes
         cls._collect_param_from_bases(meta_bases, attrs, '__PARAMS__')
@@ -58,7 +58,7 @@ class ConfigMeta(type):
                                                     {textwrap.fill(doc, 400)}
                                                 """), '    ')
 
-        return super(ConfigMeta, cls).__new__(cls, name, bases, attrs)
+        return super(ConfigurableMeta, cls).__new__(cls, name, bases, attrs)
 
     @staticmethod
     def _collect_param_from_bases(meta_bases, attrs, param_name):

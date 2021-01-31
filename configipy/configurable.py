@@ -4,9 +4,11 @@ Created 06-17-18 by Matt C. McCallum
 
 
 # Local imports
-from .config_meta import ConfigMeta
+from .configurable_meta import ConfigurableMeta
 from .helper_funcs import class_instance_for_config
 from .config import Config
+from .config_collection import ConfigCollection
+from .configurable_factory import ConfigurableFactory
 
 # Third party module imports
 # None.
@@ -15,7 +17,7 @@ from .config import Config
 import copy
 
 
-class Configurable(object, metaclass=ConfigMeta):
+class Configurable(object, metaclass=ConfigurableMeta):
     """
     A Base class for any object that has a given configuration, i.e., requires a certain set of parameters.
 
@@ -63,10 +65,10 @@ class Configurable(object, metaclass=ConfigMeta):
                 setattr(self, "_"+name, self._cfg[self.__class__.__name__][name])
 
         # Construct configurables
+        self._config_factory = ConfigurableFactory()
         for param_name, configurable in self.__CONFIGURABLES__.items():
-            cfg = Config(self._cfg[self.__class__.__name__][param_name])
-            setattr(self, "_"+param_name+"_cfg", cfg)
-            setattr(self, "_"+param_name, class_instance_for_config(configurable, cfg))
+            obj = self._config_factory.Construct(configurable, self._cfg[self.__class__.__name__][param_name])
+            setattr(self, "_"+param_name, obj)
 
     def _populateDefaults(self, cfg, defaults):
         """
@@ -95,6 +97,8 @@ class Configurable(object, metaclass=ConfigMeta):
             template: list() - A list of keys that describe the required fields to be configured for this object.
             This may includ dictionaries, allowing a heirarchy in the provided configuration.
         """
+        # TODO [matt.c.mccallum 01.05.21]: ADD TYPE CHECKING HERE - CHECK ALL CONFIGURABLES ARE OF THE RIGHT TYPE,
+        #      AND THOSE THAT ARE LISTS OF CONFIGURABLES SHOULD BE LISTS ALSO.
         for field in template:
             if isinstance(field, dict):
                 for key in field.keys():

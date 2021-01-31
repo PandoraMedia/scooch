@@ -50,6 +50,11 @@ class Config(dict):
         else:
             self.update(yaml.safe_load(config_file))
 
+        # Store any variables
+        self._vars = self.get('Constants', [])
+        if len(self._vars):
+            del self['Constants']
+
         self._VAR_FUNCS = {
             'inherit': Config._inherit,
             'datetime': Config._datetime
@@ -129,6 +134,8 @@ class Config(dict):
         """
         while type(value) is str and len(re.findall(r'\$\{(.*?)\}', value)):
             func_name = re.findall(r'\$\{(.*?)\}', value)[0]  # NOTE [matt.c.mccallum 02.14.20]: Double evaluation of regex here, not the most efficient, but we're not concerned about efficiency in Configipy.
+            if func_name in self._vars:
+                return self._vars[func_name]
             try:
                 func = self._VAR_FUNCS[func_name]
             except KeyError:
