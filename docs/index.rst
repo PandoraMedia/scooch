@@ -23,6 +23,8 @@ Indices and tables
 About
 =====
 
+The current best source of documentation on Configipy is found here `HERE. <https://wiki.savagebeast.com/display/~mmccallum/Configipy>`_
+
 Configipy allows yaml configs of class hierarchies that are...
 
  - *Human Readable*
@@ -45,13 +47,10 @@ For the following config file...
 
 .. code-block:: yaml
 
-   Experiment:
-      name: test-experiment-${datetime}
-      model_cfg:
-         DenseNet:
-            name: ${inherit}
-            num_layers: 3
-            layer_width: 1024
+   DenseNet:
+      name: ${inherit}
+      num_layers: 3
+      layer_width: 1024
 
 It may be used like so....
 
@@ -72,20 +71,21 @@ Given a configurable class hierarchy:
 
    class Model(Configurable):
 
-      _REQUIRED_CONFIG = [
-         'name'
-      ]
+      __PARAMS__ = {
+         'name': '<str> - A string describing the model'
+      }
  
       ...
 
    class DenseNet(Model):
 
-      _REQUIRED_CONFIG = Model._REQUIRED_CONFIG + [
-         'num_layers',
-         'layer_width'
-      ]
+      __PARAMS__ = {
+         'num_layers': '<int> - The number of dense layers',
+         'layer_width': '<int> - The number of neurons per layer',
+         'nonlinearity': '<str> - A string selecting the non-linearity used in this model'
+      }
 
-      _CONFIG_DEGAULTS = {
+      __PARAM_DEFAULTS__ = {
          'nonlinearity' = 'relu'
       }
 
@@ -103,11 +103,11 @@ It may be used like so...
    model = DenseNet(cfg)
 
    # Classes can be inferred from configs...
-   model = class_instance_for_config(Model, cfg['Model']['model_cfg'])
+   model = class_instance_for_config(Model, cfg)
 
    # Gets the config dictionary the class was constructed with
    model.cfg
 
    # Instance private variables are automatically populated from Config
-   model.num_layers
+   model._num_layers
    
