@@ -15,9 +15,11 @@ import distutils.cmd
 
 
 REQUIRED_PACKAGES = [
-    'pyyaml',
-    'sphinx',
-    'sphinx_rtd_theme'
+    'pyyaml==5.4.1',
+    'sphinx==3.5.1',
+    'sphinx_rtd_theme==0.5.1',
+    'ruamel.yaml==0.16.12',
+    'click==8.0.0a1'
 ]
 
 class MakeReqsCommand(distutils.cmd.Command):
