@@ -45,7 +45,7 @@ class Config(dict):
         if type(config_file) is str:
             with open(config_file) as f:
                 self.update(yaml.safe_load(f))
-        elif type(config_file) is dict:
+        elif isinstance(config_file, dict):
             self.update(config_file)
         else:
             self.update(yaml.safe_load(config_file))
