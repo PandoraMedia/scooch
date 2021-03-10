@@ -39,7 +39,7 @@ class Config(dict):
         Constructor.
 
         Args:
-            config_file: str, dict or file - A file like object or filename describing a yaml file to load
+            config_file: str, dict, file or Config - A file like object or filename describing a yaml file to load
             this class's configuration from. Alternatively, it can be a dictionary describing the 
         """
         if type(config_file) is str:
@@ -51,9 +51,12 @@ class Config(dict):
             self.update(yaml.safe_load(config_file))
 
         # Store any variables
-        self._vars = self.get('Constants', [])
-        if len(self._vars):
-            del self['Constants']
+        if isinstance(config_file, Config):
+            self._vars = config_file._vars
+        else:
+            self._vars = self.get('Constants', [])
+            if len(self._vars):
+                del self['Constants']
 
         self._VAR_FUNCS = {
             'inherit': Config._inherit,
