@@ -16,7 +16,7 @@ import distutils.cmd
 
 REQUIRED_PACKAGES = [
     'pyyaml==5.4.1',
-    'sphinx==3.5.1',
+    'sphinx<3.0',
     'sphinx_rtd_theme==0.5.1',
     'ruamel.yaml==0.16.12',
     'click==8.0.0a1'
@@ -53,5 +53,10 @@ setuptools.setup(
     description='A python module for configuring hierarchical class structures in yaml with defaults',
     install_requires=REQUIRED_PACKAGES,
     python_requires='>=3.5',
-    packages=setuptools.find_packages()
+    packages=setuptools.find_packages(),
+
+    # CLI
+    entry_points = {
+        'console_scripts': ['configipy=configipy.cli:main']
+    }
 )

@@ -11,6 +11,7 @@ Created 11-13-20 by Matt C. McCallum
 
 # Python standard library imports
 import textwrap
+import inspect
 
 
 class ConfigurableMeta(type):
@@ -42,9 +43,16 @@ class ConfigurableMeta(type):
             **Configipy Parameters**:
             """), '    ')
 
+        if '__PARAM_DOCS__' not in attrs.keys():
+            attrs['__PARAM_DOCS__'] = ''
         for param, doc in attrs['__PARAMS__'].items():
             if param in list(attrs['__CONFIGURABLES__'].keys()):
-                default_info = f" (This parameter is a Configurable: {attrs['__CONFIGURABLES__'][param].__class__.__name__})"
+                param_cls = attrs['__CONFIGURABLES__'][param]
+                if inspect.isclass(param_cls):
+                    default_info = f" (Configurable: {attrs['__CONFIGURABLES__'][param].__name__})"
+                else:
+                    # TODO [matt.c.mccallum 03.31.21]: Handle the case of ConfigList and ConfigCollection below...
+                    default_info = ""
             elif param in list(attrs['__PARAM_DEFAULTS__'].keys()):
                 param_value = attrs['__PARAM_DEFAULTS__'][param]
                 if '\n' in str(param_value) or len(str(param_value)) > 40:
@@ -53,10 +61,11 @@ class ConfigurableMeta(type):
                     default_info = f" (Default: {attrs['__PARAM_DEFAULTS__'][param]})"
             else:
                 default_info = ""
-            attrs['__doc__'] += textwrap.indent(textwrap.dedent(f"""
+            attrs['__PARAM_DOCS__'] += textwrap.indent(textwrap.dedent(f"""
                                                 **{param}**{default_info}:
                                                     {textwrap.fill(doc, 400)}
                                                 """), '    ')
+        attrs['__doc__'] += attrs['__PARAM_DOCS__']
 
         return super(ConfigurableMeta, cls).__new__(cls, name, bases, attrs)
 

@@ -13,17 +13,6 @@ Created 10-16-19 by Matt C. McCallum
 # None.
 
 
-def _all_subclasses(cls):
-    """
-    cls.__subclasses__ only transcends one level of inheretance so this is a simple 
-    recursion to find all subclasses.
-
-    Args:
-        cls: object - The class to find all subclasses for.
-    """
-    return list(set(cls.__subclasses__()).union([s for c in cls.__subclasses__() for s in _all_subclasses(c)]))
-
-
 def class_for_config(base_class, config):
     """
     Returns the feature class for a given config dictionary or Configipy Config object.
@@ -40,7 +29,7 @@ def class_for_config(base_class, config):
     Return:
         class - The class that can be constructed with the provided config dictionary.
     """
-    fclsses = _all_subclasses(base_class)
+    fclsses = base_class._all_subclasses()
     feature_class_names = [clsobj.__name__ for clsobj in fclsses]
 
     # Search for matching configuration
