@@ -3,15 +3,15 @@ Created 11-13-20 by Matt C. McCallum
 """
 
 
-# Local imports
-# None.
+# Python standard library imports
+import textwrap
+import inspect
 
 # Third party imports
 # None.
 
-# Python standard library imports
-import textwrap
-import inspect
+# Local imports
+# None.
 
 
 class ConfigurableMeta(type):
@@ -43,7 +43,7 @@ class ConfigurableMeta(type):
             **Configipy Parameters**:
             """), '    ')
 
-        if '__PARAM_DOCS__' not in attrs.keys():
+        if '__PARAM_DOCS__' not in attrs:
             attrs['__PARAM_DOCS__'] = ''
         for param, doc in attrs['__PARAMS__'].items():
             if param in list(attrs['__CONFIGURABLES__'].keys()):
