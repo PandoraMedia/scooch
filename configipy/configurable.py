@@ -31,11 +31,15 @@ class Configurable(object, metaclass=ConfigurableMeta):
     up to the derived class to use these values.
     """
     
-    __PARAMS__ = {} # <= Parameters that must be specified in the class configuration
+    __PARAMS__ = {
+        "namespace": "<str> - A namespace for the feature, allowing grouping of features, or two features with otherwise identical configurations to be distinct."
+    } # <= Parameters that must be specified in the class configuration
 
     __CONFIGURABLES__ = {} # <= Parameters that at Configipy configurables and will be constructed according to the configuration dicts specified in the Config
 
-    __PARAM_DEFAULTS__ = {} # <= Parameters that are optional, and if not provided, will assume default values
+    __PARAM_DEFAULTS__ = {
+        "namespace": "root"
+    } # <= Parameters that are optional, and if not provided, will assume default values
 
     def __init__(self, cfg):
         """
@@ -184,6 +188,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
                         print(textwrap.indent(f'Select Subclass for Component of Type "{c_type.__name__}":\n-\n{formatted_docs}\n-\n' + '\n'.join(subcls_names), '  '*level + '+ '))
                         try:
                             selection = int(input('  '*level + '+ '))
+                            if selection < 0: raise IndexError  # Prevent negative indexing in UI.
                             print(' ')
                             inputting = False
                             return subclss[selection].CreateConfig(interactive, level + 1)
@@ -193,11 +198,10 @@ class Configurable(object, metaclass=ConfigurableMeta):
                 else:
                     return {f'<{c_type.__name__}>': None}
 
-        def unpack_config_collection(c_type, docs, level):
+        def unpack_config_list(c_type, docs, level):
             """
-            Configure a collection of sub configurable configurations, optionally with user prompts 
-            for types. The collection contains multiple Configurable elements and could be a Collection
-            (dict), or a list of n elements.
+            Configure a list of sub configurable configurations, optionally with user prompts 
+            for types.
 
             Args:
                 c_type: Configurable - The Configurable to have a configuration constructed for.
@@ -218,52 +222,92 @@ class Configurable(object, metaclass=ConfigurableMeta):
                 subtype_name = subtype.__class__.__name__
             else:
                 subtype_name = subtype.__name__
-            if isinstance(c_type, ConfigList):
-                if interactive:
-                    inputting = True
-                    while inputting:
-                        
-                        print(textwrap.indent(f'Choose number of elements in Config List of type "{subtype_name}":\n-\n{formatted_docs}\n-', '  '*level + '+ '))
-                        try:
-                            number_elem = int(input('  '*level + '+ '))
-                            print(' ')
-                            inputting = False
-                        except ValueError:
-                            print(textwrap.indent(f'Invalid value, please enter an integer', '  '*level))
-                            print(' ')
-                cfg = []
-                for _ in range(number_elem):
-                    if type(subtype) in (ConfigList, ConfigCollection):
-                        cfg += [unpack_config_collection(subtype, docs, level+1)]
-                    else:
-                        cfg += [get_subconfig(subtype, '', level+1)]
-            elif isinstance(c_type, ConfigCollection):
-                if interactive:
-                    inputting = True
-                    cfg = {}
-                    while inputting:
-                        print(textwrap.indent(f'Creating a collection of type "{subtype_name}":\n-\n{formatted_docs}\n-', '  '*level + '+ '))
-                        print(textwrap.indent(f'Choose a name for an element in collection of type "{subtype_name}", \nor press enter to finish generating this collection:', '  '*level + '+ '))
-                        name = input('  '*level + '+ ')
+
+            if interactive:
+                inputting = True
+                while inputting:
+                    
+                    print(textwrap.indent(f'Choose number of elements in Config List of type "{subtype_name}":\n-\n{formatted_docs}\n-', '  '*level + '+ '))
+                    try:
+                        number_elem = int(input('  '*level + '+ '))
+                        if number_elem < 0: raise ValueError
                         print(' ')
-                        if len(name) == 0 or name.isspace():
-                            inputting = False
-                        else:
-                            if type(subtype) in (ConfigList, ConfigCollection):
-                                cfg[name] = unpack_config_collection(subtype, docs, level+1)
-                            else:
-                                cfg[name] = get_subconfig(subtype, '', level+1)
+                        inputting = False
+                    except ValueError:
+                        print(textwrap.indent(f'Invalid value, please enter a positive integer', '  '*level))
+                        print(' ')
+            cfg = []
+            for _ in range(number_elem):
+                if type(subtype) not in (ConfigList, ConfigCollection):
+                    docs = ''
+                cfg += [populate_config(subtype, docs, level+1)]
             return cfg
+
+        def unpack_config_collection(c_type, docs, level):
+            """
+            Configure a collection of sub configurable configurations, optionally with user prompts 
+            for types.
+
+            Args:
+                c_type: ConfigCollection - The Configurable Collection to have a configuration constructed for.
+
+                docs: str - The docs to print out in user prompts to explain the config purpose to
+                the user.
+
+                level: int - How many layers deep in a configuration heirarchy we are. This can 
+                help with printing prompts in interactive mode.
+
+            Returns:
+                dict - A dictionary containing the constructed configuration
+            """
+            formatted_docs = textwrap.indent('\n'.join(textwrap.wrap(docs, 80)), '  ')
+
+            subtype = c_type.subtype
+            if type(subtype) in (ConfigList, ConfigCollection):
+                subtype_name = subtype.__class__.__name__
+            else:
+                subtype_name = subtype.__name__
+
+            if interactive:
+                inputting = True
+                cfg = {}
+                while inputting:
+                    print(textwrap.indent(f'Creating a collection of type "{subtype_name}":\n-\n{formatted_docs}\n-', '  '*level + '+ '))
+                    print(textwrap.indent(f'Choose a name for an element in collection of type "{subtype_name}", \nor press enter to finish generating this collection:', '  '*level + '+ '))
+                    name = input('  '*level + '+ ')
+                    print(' ')
+                    if len(name) == 0 or name.isspace():
+                        inputting = False
+                    else:
+                        if type(subtype) not in (ConfigList, ConfigCollection):
+                            docs = ''
+                        cfg[name] = populate_config(subtype, docs, level+1)
+            return cfg
+
+        def populate_config(cfgrble_type, docs, lvl):
+            """
+            A hub function to distribute the configuration construction to the correct handler, based on the type
+            of configuration required.
+
+            Args:
+                cfgrble_type: (Configurable, ConfigList, or ConfigCollection) - A type of configuration to be constructed.
+
+                docs: str - The docs describing the configuration to be constructed.
+
+                lvl: int - How deep in a configuration heirarchy we are - useful for pretty printing user prompts.
+            """
+            if type(cfgrble_type) is ConfigList:
+                value = unpack_config_list(cfgrble_type, docs, lvl)
+            elif type(cfgrble_type) is ConfigCollection:
+                value = unpack_config_collection(cfgrble_type, docs, lvl)
+            else:
+                value = get_subconfig(cfgrble_type, docs, lvl)
+            return value
 
         # Add configurables
         for param, cfgrble_type in cls.__CONFIGURABLES__.items():
             docs = cls.__PARAMS__[param]
-            if type(cfgrble_type) in (ConfigList, ConfigCollection):
-                value = unpack_config_collection(cfgrble_type, docs, level+1)
-            else:
-                value = get_subconfig(cfgrble_type, docs, level+1)
-                
-            config[param] = value
+            config[param] = populate_config(cfgrble_type, docs, level+1)
         
         # Add required parameters and comments
         for ky, val in cls.__PARAMS__.items():
