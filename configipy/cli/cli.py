@@ -2,21 +2,17 @@
 Created 02-03-21 by Matt C. McCallum
 """
 
-
-# Local imports
-from . import options
-from configipy import Config
+# Python standard library imports
+import importlib
+import textwrap
 
 # Third party imports
 import click
 import ruamel.yaml
 
-# Python standard library imports
-import importlib
-import textwrap
-
-
-import sys
+# Local imports
+from . import options
+import json
 
 
 @click.group()
@@ -36,8 +32,11 @@ def construct(config, configurable, pymodule):
         from_x_import_all(module)
     print('\n')
     cfg = eval(f"{configurable}.CreateConfig(True)")
-    with open(config, 'w') as f:
-        ruamel.yaml.YAML().dump(cfg, f)
+    if config != None and len(config) > 0:
+        with open(config, 'w') as f:
+            ruamel.yaml.YAML().dump(cfg, f)
+    else:
+        print(json.dumps(cfg, indent=4, sort_keys=True))
 
 
 @main.command("options")
