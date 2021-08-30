@@ -13,60 +13,38 @@ import click
 # None.
 
 
+def partial_option(*args, **kwargs):
+    option = click.option(*args, **kwargs)
+
+    def option_decorator(command=None):
+        if command:
+            # We were used as a decorator without arguments, and now we're being
+            # called on the command function.
+            return option(command)
+        else:
+            # We are being called with empty parens to construct a decorator.
+            return option
+
+    return option_decorator
 
 #
 # Options for several commands
 #
+config = partial_option(
+        "--config", 
+        "-c",
+        help="Path to yaml configipy file for creation or processing"
+    )
 
-def config(*args, **kwargs):
+configurable = partial_option(
+        "--configurable", 
+        "-f",
+        help="Complete import path to configurable class in python import syntax, e.g., package.module.classname", 
+    )
 
-    def wrapper(func):
-        return click.option(
-            "--config", 
-            "-c",
-            help="Path to yaml configipy file for creation or processing", 
-            **kwargs)(func)
-
-    if args:
-        return wrapper(args[0])
-    return wrapper
-
-def configurable(*args, **kwargs):
-
-    def wrapper(func):
-        return click.option(
-            "--configurable", 
-            "-f",
-            help="Complete import path to configurable class in python import syntax, e.g., package.module.classname", 
-            **kwargs)(func)
-
-    if args:
-        return wrapper(args[0])
-    return wrapper
-
-def param(*args, **kwargs):
-
-    def wrapper(func):
-        return click.option(
-            "--param", 
-            "-p",
-            help="A value for a given option in the config", 
-            **kwargs)(func)
-
-    if args:
-        return wrapper(args[0])
-    return wrapper
-
-def pymodule(*args, **kwargs):
-
-    def wrapper(func):
-        return click.option(
-            "--pymodule", 
-            "-m",
-            help="Additional python packages / modules to import all from before running code.", 
-            multiple=True,
-            **kwargs)(func)
-
-    if args:
-        return wrapper(args[0])
-    return wrapper
+pymodule = partial_option(
+        "--pymodule", 
+        "-m",
+        help="Additional python packages / modules to import all from before running code.", 
+        multiple=True,
+)
