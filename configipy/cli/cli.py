@@ -20,7 +20,7 @@ def main():
     pass
 
 
-@main.command("construct")
+@main.command()
 @options.config
 @options.configurable
 @options.pymodule
@@ -39,7 +39,7 @@ def construct(config, configurable, pymodule):
         print(json.dumps(cfg, indent=4, sort_keys=True))
 
 
-@main.command("options")
+@main.command()
 @options.configurable
 @options.pymodule
 def options(configurable, pymodule):
