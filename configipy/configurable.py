@@ -3,19 +3,19 @@ Created 06-17-18 by Matt C. McCallum
 """
 
 
+# Python standard library imports
+import copy
+import re
+import textwrap
+
+# Third party module imports
+from ruamel.yaml.comments import CommentedMap
+
 # Local imports
 from configipy.config_list import ConfigList
 from .configurable_meta import ConfigurableMeta
 from .config_collection import ConfigCollection
 from .configurable_factory import ConfigurableFactory
-
-# Third party module imports
-from ruamel.yaml.comments import CommentedMap
-
-# Python standard library imports
-import copy
-import re
-import textwrap
 
 
 class Configurable(object, metaclass=ConfigurableMeta):
@@ -185,13 +185,11 @@ class Configurable(object, metaclass=ConfigurableMeta):
                         try:
                             selection = int(input('  '*level + '+ '))
                             print(' ')
-                            if selection >= len(subclss):
-                                raise ValueError
                             inputting = False
-                        except ValueError:
+                            return subclss[selection].CreateConfig(interactive, level + 1)
+                        except (ValueError, IndexError):
                             print(textwrap.indent(f'Invalid value, please enter an integer from 0 to {len(subclss)-1}', '  '*level))
                             print(' ')
-                    return subclss[selection].CreateConfig(interactive, level + 1)
                 else:
                     return {f'<{c_type.__name__}>': None}
 
