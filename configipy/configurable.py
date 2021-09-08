@@ -28,13 +28,13 @@ class Configurable(object, metaclass=ConfigurableMeta):
     """
     
     __PARAMS__ = {
-        "namespace": "<str> - A namespace for the feature, allowing grouping of features, or two features with otherwise identical configurations to be distinct."
+        "config_namespace": "<str> - A namespace for the configuration, allowing grouping of configurations, or two configurations with otherwise identical configurations to be distinct."
     } # <= Parameters that must be specified in the class configuration
 
     __CONFIGURABLES__ = {} # <= Parameters that at Configipy configurables and will be constructed according to the configuration dicts specified in the Config
 
     __PARAM_DEFAULTS__ = {
-        "namespace": "root"
+        "config_namespace": "root"
     } # <= Parameters that are optional, and if not provided, will assume default values
 
     def __init__(self, cfg):
@@ -81,6 +81,9 @@ class Configurable(object, metaclass=ConfigurableMeta):
 
             defaults: dict() - A set of defaults to configure in `cfg` if they do not already exist there.
         """
+        # If no config was provided for this class, start with an empty dictionary.
+        if cfg is None:
+            cfg = dict()
         for field, value in defaults.items():
             if field not in cfg.keys():
                 cfg[field] = value
