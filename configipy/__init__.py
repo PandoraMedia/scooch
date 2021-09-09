@@ -6,7 +6,7 @@ DEFAULT_NAMESPACE = "root"
 
 from .config import *
 from .configurable import *
-from .config_list import *f
+from .config_list import *
 from .config_collection import *
 from .config_factory import *
 
