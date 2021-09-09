@@ -10,6 +10,7 @@ import copy
 # None
 
 # Local imports
+from . import DEFAULT_NAMESPACE
 from .configurable_meta import ConfigurableMeta
 from .configurable_factory import ConfigurableFactory
 
@@ -34,7 +35,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
     __CONFIGURABLES__ = {} # <= Parameters that at Configipy configurables and will be constructed according to the configuration dicts specified in the Config
 
     __PARAM_DEFAULTS__ = {
-        "config_namespace": "root"
+        "config_namespace": DEFAULT_NAMESPACE
     } # <= Parameters that are optional, and if not provided, will assume default values
 
     def __init__(self, cfg):

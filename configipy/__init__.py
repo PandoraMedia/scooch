@@ -2,6 +2,8 @@
 Created 06-21-18 Matt C. McCallum
 """
 
+DEFAULT_NAMEPSACE = "root"
+
 from .config import *
 from .configurable import *
 from .config_list import *
