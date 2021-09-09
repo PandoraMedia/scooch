@@ -10,7 +10,7 @@ import copy
 # None
 
 # Local imports
-from . import DEFAULT_NAMESPACE
+from .constants import DEFAULT_NAMESPACE
 from .configurable_meta import ConfigurableMeta
 from .configurable_factory import ConfigurableFactory
 
