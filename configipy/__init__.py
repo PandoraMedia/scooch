@@ -2,11 +2,11 @@
 Created 06-21-18 Matt C. McCallum
 """
 
+DEFAULT_NAMESPACE = "root"
 
-from .constants import *
 from .config import *
 from .configurable import *
-from .config_list import *
+from .config_list import *f
 from .config_collection import *
 from .config_factory import *
 
