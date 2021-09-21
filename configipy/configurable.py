@@ -72,7 +72,19 @@ class Configurable(object, metaclass=ConfigurableMeta):
             obj = self._config_factory.Construct(configurable, self._cfg[self.__class__.__name__][param_name])
             setattr(self, "_"+param_name, obj)
 
-    def _populateDefaults(self, cfg, defaults):
+    @classmethod
+    def PopulateDefaults(cls, cfg):
+        """
+        Populates the defaults for this Configurable in the provided cfg, without actually constructing it.
+
+        Args:
+            cfg: Config / Dict - A configuration for this configurable to be populated with defaults where missing
+            config values exist.
+        """
+        cls._populateDefaults(cfg[cls.__name__], cls.__PARAM_DEFAULTS__)
+
+    @classmethod
+    def _populateDefaults(cls, cfg, defaults):
         """
         Iterates through all of the items in the defaults and transfers them over to the configuration
         if they are not already there.
@@ -90,7 +102,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
                 cfg[field] = value
             elif isinstance(value, dict):
                 # Check the sub fields
-                self._populateDefaults(cfg[field], value)
+                cls._populateDefaults(cfg[field], value)
 
     def _verifyConfig(self, cfg, template):
         """
