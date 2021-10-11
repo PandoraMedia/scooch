@@ -54,7 +54,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
         required_config = list(self.__PARAMS__.keys())
 
         # Populate defaults
-        self._populateDefaults(self._cfg[self.__class__.__name__], self.__PARAM_DEFAULTS__)
+        self._populate_defaults_recurse(self._cfg[self.__class__.__name__], self.__PARAM_DEFAULTS__)
 
         # Verify configuration
         # NOTE [matt.c.mccallum 12.16.20]: Just do this for this configurable, all sub-configurables will be verified upon their construction, respectively.
@@ -81,10 +81,10 @@ class Configurable(object, metaclass=ConfigurableMeta):
             cfg: Config / Dict - A configuration for this configurable to be populated with defaults where missing
             config values exist.
         """
-        cls._populateDefaults(cfg[cls.__name__], cls.__PARAM_DEFAULTS__)
+        cls._populate_defaults_recurse(cfg[cls.__name__], cls.__PARAM_DEFAULTS__)
 
     @classmethod
-    def _populateDefaults(cls, cfg, defaults):
+    def _populate_defaults_recurse(cls, cfg, defaults):
         """
         Iterates through all of the items in the defaults and transfers them over to the configuration
         if they are not already there.
@@ -102,7 +102,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
                 cfg[field] = value
             elif isinstance(value, dict):
                 # Check the sub fields
-                cls._populateDefaults(cfg[field], value)
+                cls._populate_defaults_recurse(cfg[field], value)
 
     def _verifyConfig(self, cfg, template):
         """
