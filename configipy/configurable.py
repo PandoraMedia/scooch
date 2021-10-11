@@ -58,7 +58,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
 
         # Verify configuration
         # NOTE [matt.c.mccallum 12.16.20]: Just do this for this configurable, all sub-configurables will be verified upon their construction, respectively.
-        self._verifyConfig(self._cfg[self.__class__.__name__], required_config)
+        self._verify_config(self._cfg[self.__class__.__name__], required_config)
 
         # Set properties
         param_config = [it for it in self.__PARAMS__.keys() if it not in list(self.__CONFIGURABLES__.keys())]
@@ -104,7 +104,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
                 # Check the sub fields
                 cls._populate_defaults_recurse(cfg[field], value)
 
-    def _verifyConfig(self, cfg, template):
+    def _verify_config(self, cfg, template):
         """
         Checks that all the required fields in the object configuration are there.
 
@@ -121,7 +121,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
                 for key in field.keys():
                     if key not in cfg.keys():
                         raise ValueError("Configipy config error: " + key + " value not found in " + self.__class__.__name__ + " object configuration")
-                    self._verifyConfig(cfg[key], field[key])
+                    self._verify_config(cfg[key], field[key])
             elif field not in cfg.keys():
                 raise ValueError("Configipy config error: " + field + " value not found in " + self.__class__.__name__ + " object configuration")
 
