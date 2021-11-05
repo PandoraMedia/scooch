@@ -30,9 +30,9 @@ class Configurable(object, metaclass=ConfigurableMeta):
     
     __PARAMS__ = {
         "config_namespace": "<str> - A namespace for the configuration, allowing grouping of configurations, or two configurations with otherwise identical configurations to be distinct."
-    } # <= Parameters that must be specified in the class configuration
+    } # <= Parameters that can be specified in the class's configuration
 
-    __CONFIGURABLES__ = {} # <= Parameters that at Configipy configurables and will be constructed according to the configuration dicts specified in the Config
+    __CONFIGURABLES__ = {} # <= Parameters that are Configipy configurables and will be constructed according to the configuration dicts specified in the Config
 
     __PARAM_DEFAULTS__ = {
         "config_namespace": DEFAULT_NAMESPACE
@@ -45,6 +45,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
         Args:
             cfg: dict - An object providing the configuration parameters for this object.
         """
+        # TODO [matt.c.mccallum 11.04.21]: Gracefully handle the error case that the top-level dictionary is not a single key value corresponding to a class...
         if not cfg[self.__class__.__name__]:
             self._cfg = {self.__class__.__name__: {}}
         else:
@@ -60,17 +61,12 @@ class Configurable(object, metaclass=ConfigurableMeta):
         # NOTE [matt.c.mccallum 12.16.20]: Just do this for this configurable, all sub-configurables will be verified upon their construction, respectively.
         self._verify_config(self._cfg[self.__class__.__name__], required_config)
 
-        # Set properties
-        param_config = [it for it in self.__PARAMS__.keys() if it not in list(self.__CONFIGURABLES__.keys())]
-        for name in param_config:
-            if type(name) is str:
-                setattr(self, "_"+name, self._cfg[self.__class__.__name__][name])
-
         # Construct configurables
         self._config_factory = ConfigurableFactory()
+        self._config_instances = {}
         for param_name, configurable in self.__CONFIGURABLES__.items():
             obj = self._config_factory.Construct(configurable, self._cfg[self.__class__.__name__][param_name])
-            setattr(self, "_"+param_name, obj)
+            self._config_instances[param_name] = obj
 
     @classmethod
     def PopulateDefaults(cls, cfg):

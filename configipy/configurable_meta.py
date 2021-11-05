@@ -11,7 +11,9 @@ import inspect
 # None.
 
 # Local imports
-# None.
+from . import ParamDefaults
+from .configurable_param import ConfigurableParam
+from .param import Param
 
 
 class ConfigurableMeta(type):
@@ -24,50 +26,97 @@ class ConfigurableMeta(type):
         """
         Preconstructor.
 
-        Currently does two things:
+        Currently does three things:
             - Collects all parameters and parameter defaults through the Configurable inheretence hierarchy
+            - Translates scooch configuration dictionaries into scooch parameter types and vice versa
             - Updates the class doc string with information on its configipy parameters
         """
         # Get all base classes that are also ConfigurableMeta types
         meta_bases = [base for base in bases if type(base) is ConfigurableMeta]
 
-        # Collect all params from base classes
+        # Collect all params from base classes\
         cls._collect_param_from_bases(meta_bases, attrs, '__PARAMS__')
         cls._collect_param_from_bases(meta_bases, attrs, '__PARAM_DEFAULTS__')
         cls._collect_param_from_bases(meta_bases, attrs, '__CONFIGURABLES__')
 
+        # Populate dictionaries with any scooch Param classes found on the class.
+        for attr_name, value in attrs.items():
+
+            if isinstance(value, Param):
+                # Populate __PARAMS__
+                attrs['__PARAMS__'][attr_name.lstrip('_')] = value.doc
+                # Populate __PARAM_DEFAULTS__
+                if value.default != ParamDefaults.NO_DEFAULT:
+                    attrs['__PARAM_DEFAULTS__'][attr_name.lstrip('_')] = value.default
+
+            if isinstance(value, ConfigurableParam):
+                # Populate __PARAMS__
+                attrs['__PARAMS__'][attr_name.lstrip('_')] = value.doc
+                # Add to __CONFIGURABLES__
+                attrs['__CONFIGURABLES__'][attr_name.lstrip('_')] = value.type
+
+        # Create Param / ConfigurableParam attributes that don't already exist from the scooch Configurable dictionaries
+        for attr_name in attrs['__PARAMS__']:
+            if '_'+attr_name not in attrs and attr_name not in attrs:
+                if attr_name in attrs['__CONFIGURABLES__']:
+                    attrs['_'+attr_name] = ConfigurableParam(attrs['__CONFIGURABLES__'][attr_name], attrs['__PARAMS__'][attr_name])
+                else:
+                    attrs['_'+attr_name] = Param(None, attrs['__PARAM_DEFAULTS__'].get(attr_name, None), attrs['__PARAMS__'][attr_name])
+
         # Update the docs
-        if len(list(attrs['__PARAMS__'].keys())):
-            attrs['__doc__'] += textwrap.indent(textwrap.dedent("""
+        attrs['__doc__'] = cls._populate_docs(attrs['__doc__'], attrs['__PARAMS__'], attrs['__PARAM_DEFAULTS__'], attrs['__CONFIGURABLES__'])
+
+        return super(ConfigurableMeta, cls).__new__(cls, name, bases, attrs)
+
+    @staticmethod
+    def _populate_docs(class_doc, params_dict, defaults_dict, configurables_dict):
+        """
+        Augments the class's doc string with information about the class's Scooch configuration.
+
+        Args:
+            class_doc: str - The class's doc string to be extended with Scooch config information.
+
+            params_dict: dict(str, str) - The class's parameter dict, mapping parameter names to 
+            parameter docs.
+
+            defaults_dict: dict(str, object) - The class's defaults dict, mapping parameter names 
+            to default parameter values
+
+            configurables_dict: dict(str, Configurable) - The class's configurables dict, mapping
+            Scooch configurable attributes to Scooch configurable types.
+
+        Returns:
+            class_doc: str - The class's doc string with Scooch configuration information appended.
+        """
+
+        if len(list(params_dict.keys())):
+            class_doc += textwrap.indent(textwrap.dedent("""
 
             **Configipy Parameters**:
             """), '    ')
 
-        if '__PARAM_DOCS__' not in attrs:
-            attrs['__PARAM_DOCS__'] = ''
-        for param, doc in attrs['__PARAMS__'].items():
-            if param in list(attrs['__CONFIGURABLES__'].keys()):
-                param_cls = attrs['__CONFIGURABLES__'][param]
+        for param, doc in params_dict.items():
+            if param in list(configurables_dict.keys()):
+                param_cls = configurables_dict[param]
                 if inspect.isclass(param_cls):
-                    default_info = f" (Configurable: {attrs['__CONFIGURABLES__'][param].__name__})"
+                    default_info = f" (Configurable: {configurables_dict[param].__name__})"
                 else:
                     # TODO [matt.c.mccallum 03.31.21]: Handle the case of ConfigList and ConfigCollection below...
                     default_info = ""
-            elif param in list(attrs['__PARAM_DEFAULTS__'].keys()):
-                param_value = attrs['__PARAM_DEFAULTS__'][param]
+            elif param in list(defaults_dict.keys()):
+                param_value = defaults_dict[param]
                 if '\n' in str(param_value) or len(str(param_value)) > 40:
                     param_value = f" (Default is of type {type(param_value)})"
                 else:
-                    default_info = f" (Default: {attrs['__PARAM_DEFAULTS__'][param]})"
+                    default_info = f" (Default: {defaults_dict[param]})"
             else:
                 default_info = ""
-            attrs['__PARAM_DOCS__'] += textwrap.indent(textwrap.dedent(f"""
+            class_doc += textwrap.indent(textwrap.dedent(f"""
                                                 **{param}**{default_info}:
                                                     {textwrap.fill(doc, 400)}
                                                 """), '    ')
-        attrs['__doc__'] += attrs['__PARAM_DOCS__']
 
-        return super(ConfigurableMeta, cls).__new__(cls, name, bases, attrs)
+        return class_doc
 
     @staticmethod
     def _collect_param_from_bases(meta_bases, attrs, param_name):
