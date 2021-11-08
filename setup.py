@@ -114,7 +114,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/PandoraMedia/scooch",
     author="Matt C. McCallum",
-    author_email="contact@mattcmccallum.com",
+    author_email="scooch@mattcmccallum.com",
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',

@@ -40,7 +40,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
     """
     
     __PARAMS__ = {
-        "config_namespace": "<str> - A namespace for the configuration, allowing grouping of configurations, or two configurations with otherwise identical configurations to be distinct."
+        "config_namespace": "<str> - A namespace for the configuration, configs in distinct namespaces will have distinct identities."
     } # <= Parameters that can be specified in the class's configuration
 
     __CONFIGURABLES__ = {} # <= Parameters that are Scooch configurables and will be constructed according to the configuration dicts specified in the Config
