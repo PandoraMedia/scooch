@@ -2,12 +2,7 @@
 Batcher Example
 ===
 
-This example provides a walkthrough in starting a new Scooch configurable codebase for creating mini-batches to be used in a gradient descent algorithm. It highlights many of the features and benefits of using Scooch.
-
-Starting with a new class hierarchy
-===
-
-If you are starting a new project, scooch is an easy way to keep your code structured and configurable as you develop. In this example, we'll create a `Batcher` class that produces mini-batches for gradient descent.
+If you are starting a new project, scooch is an easy way to keep your code structured and configurable as you develop. This example provides a walkthrough in starting a new Scooch configurable codebase for creating mini-batches to be used in a gradient descent algorithm. It highlights many of the features and benefits of using Scooch.
 
 To get started create a python environment and install the required packages in the `requirements.txt` file. If you do not already have this example on your machine, you will also need to clone the repo:
 
