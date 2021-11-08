@@ -50,7 +50,7 @@ class ConfigurableParam:
 
     @property
     def doc(self):
-        return self._doc
+        return f"<Configurable({str(self._type.__name__)})> - {self._doc}"
 
     def __set_name__(self, owner, name):
         """

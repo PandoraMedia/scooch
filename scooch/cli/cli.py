@@ -72,7 +72,7 @@ def options(configurable, pymodule):
     except StopIteration:
         print(f"Error: No Configurable named {configurable} found (after importing: {pymodule})")
         return
-    subclss = configurable._all_subclasses()
+    subclss = configurable._all_subclasses() + [configurable]
     # TODO [matt.c.mccallum 02.03.21]: If there's no subclasses just print out the base class
     names = [sub.__name__ for sub in subclss]
     docs = [sub.__doc__ for sub in subclss]
