@@ -38,6 +38,8 @@ class Configurable(object, metaclass=ConfigurableMeta):
     It is assumed that values further down the heirarchy are for configuration of other objects and it is
     up to the derived class to use these values.
     """
+
+    __SCOOCH_NAME__ = None
     
     __PARAMS__ = {
         "config_namespace": "<str> - A namespace for the configuration, configs in distinct namespaces will have distinct identities."
