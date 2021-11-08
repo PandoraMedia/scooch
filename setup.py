@@ -147,6 +147,6 @@ setuptools.setup(
 
     # CLI
     entry_points = {
-        'console_scripts': ['configipy=configipy.cli:main']
+        'console_scripts': ['scooch=scooch.cli:main']
     }
 )
