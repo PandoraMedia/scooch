@@ -6,7 +6,7 @@ Benefits of Scooch
 Many python configuration libraries can help the type of iterative workflows practiced in machine learning, by centralizing the configuration of your iterations to a configuration file. However, because Scooch is object oriented, there are a number of benefits that we believe make it a particularly good choice.
 
 Plug and play code configuration
-
+`````````````````````````````````
 
 Because the config file corresponds directly to the types in a class hierarchy, the selection of subclasses in that code can be configured right there in the config file. This is useful when you implement several different methodologies for doing a single task. For example, an ML practitioner may implement several different ways of augmenting data within a class that creates create mini batches for a gradient descent algorithm. Those "augmenters" may do things like add noise, translate, and rotate the data. That practitioner could write an `Augmenter` base class, and several subclasses `NoiseAugmenter`, `TranslationAugmenter` and `PitchShiftAugmenter`. Each of these subclasses will be selectable and configurable by adjusting the configuration file, without any changes in the code. Furthermore, several configurations of the same class could be created simply by adjusting the config file. This mirrors the benefits of abstraction and polymorphism in OOP. For example, a `Batcher` with many augmenters might be configured like so:
 

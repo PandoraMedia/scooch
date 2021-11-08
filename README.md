@@ -43,7 +43,7 @@ There are many other projects out there that endeavor to translate config files 
  - [Sacred](https://sacred.readthedocs.io/en/stable/index.html)
  - [Hydra](https://hydra.cc/)
 
-However, what makes Scooch different is that it not only translates config parameters into variables in your code, but into object oriented class hierarchies. This means configurations can benefit from object oriented concepts such as Inheretance, Encapsulation, Abstraction and Polymorphism. The benefits of Scooch are outlined in more detail in the [Benefits of Scooch](#Benefits-of-Scooch) subsections below.
+However, what makes Scooch different is that it not only translates config parameters into variables in your code, but into object oriented class hierarchies. This means configurations can benefit from object oriented concepts such as Inheretance, Encapsulation, Abstraction and Polymorphism. The benefits of Scooch are outlined in more detail in the [Benefits of Scooch](http://www.mattcmccallum.com/scooch/docs/benefits_of_scooch.html) section of the [docs](http://www.mattcmccallum.com/scooch/docs).
 
 What does a Scooch config look like?
 ===
