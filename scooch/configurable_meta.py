@@ -35,7 +35,7 @@ class ConfigurableMeta(type):
 
     def __new__(cls, name, bases, attrs):
         """
-        Preconstructor.
+        **Preconstructor.**
 
         Currently does three things:
             - Collects all parameters and parameter defaults through the Configurable inheretence hierarchy

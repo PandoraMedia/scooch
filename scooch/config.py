@@ -47,7 +47,7 @@ class Config(dict):
 
     def __init__(self, config_file):
         """
-        Constructor.
+        **Constructor.**
 
         Args:
             config_file: str, dict, file or Config - A file like object or filename describing a yaml file to load

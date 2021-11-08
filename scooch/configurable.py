@@ -51,7 +51,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
 
     def __init__(self, cfg):
         """
-        Constructor.
+        **Constructor.**
 
         Args:
             cfg: dict - An object providing the configuration parameters for this object.
