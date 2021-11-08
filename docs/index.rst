@@ -1,113 +1,137 @@
-.. Congigipy documentation master file, created by
+.. Scooch documentation master file, created by
    sphinx-quickstart on Wed Feb 19 22:09:10 2020.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Configipy Documentation
+Scooch Documentation
 =====================================
 
 .. toctree::
-   :maxdepth: 2
+   :glob:
+   :maxdepth: 1
    :caption: Contents:
 
-   config
-   configurable
+   benefits_of_scooch
+   getting_started/getting_started
+   api/api
 
-Indices and tables
-==================
+What is Scooch?
+---------------
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+Scooch is a recursive acronym for **S**\ cooch **C**\ onfigures **O**\ bject **O**\ riented **C**\ lass **H**\ ierarchies, and that's exactly what this package does. It is a configuration package for python codebases that simplifies the problem of configuring parameters in python code by translating YAML configuration files into object oriented class hierarchies.
 
-About
-=====
+Who needs Scooch?
+-----------------
 
-The current best source of documentation on Configipy is found here `HERE. <https://wiki.savagebeast.com/display/~mmccallum/Configipy>`_
+Scooch is useful for people who need a good interface to enable "tweakability" in their code. ML practitioners are a good example. They typically write code that is intended to be continuously experimented with and adjusted in response to observations from running the code. As such, it is useful to abstract these tweakable parameters from the code into a config file, providing three major benefits:
 
-Configipy allows yaml configs of class hierarchies that are...
+* The config file provides a centralized location for adjustable parameters of interest in the code, improving iteration and workflow.
+* Loading, saving and adjusting the configuration of your code is separated from the many other working variables and data structures that may exist in code.
+* The configuration of any part of the code can be hashed, logged, and indexed, to provide a record of the code configuration at any one time.
 
- - *Human Readable*
- - *Human Writable*
+Why use Scooch?
+---------------
 
-Human writable in the sense that they are robust to typos and errors,
-and human readable in the sense that they don't contain spurious variables
-pertaining to the mechanical components of a class, or the data therein, 
-only the tunable knobs that humans are interested in.
+There are many other projects out there that endeavor to translate config files into parameters in your code, for example:
 
-This functionality is currently implemented in two classes...
+* `Gin <https://github.com/google/gin-config>`_
+* `Sacred <https://sacred.readthedocs.io/en/stable/index.html>`_
+* `Hydra <https://hydra.cc/>`_
 
- - *Config* - A class for reading in, and performing operations on a human written config
- - *Configurable* - A base class for classes who want to be configurable via config objects
+However, what makes Scooch different is that it not only translates config parameters into variables in your code, but into object oriented class hierarchies. This means configurations can benefit from object oriented concepts such as Inheretance, Encapsulation, Abstraction and Polymorphism. The benefits of Scooch are outlined in more detail in the :ref:`benefits` section.
 
-Classes are then configured by yaml config files which provides a sort of user interface
-to them.
+What does a Scooch config look like?
+------------------------------------
 
-For the following config file...
+Scooch config files map parameter configurations directly to python class hierarchies, and so your config file becomes a description of all configurable class's inside your class hierarchy. For example, a class designed to batch samples for training an ML model that uses gradient descent might have a :code:`config.yaml` file that looks something like:
 
 .. code-block:: yaml
 
-   DenseNet:
-      name: ${inherit}
-      num_layers: 3
-      layer_width: 1024
+    Batcher:
+        batch_size: 128
+        feature:
+            SpectrogramFeature:
+                hop_size: 128
+                n_bins: 256
+        augmenters:
+            - NoiseAugmenter:
+                    augmentations_per_sample: 3
+                    min_noise: -20 
+                    max_noise: 20 
+            - TranslationAugmenter:
+                    augmentations_per_sample: 5
+                    displacement_variance: 100
 
-It may be used like so....
+Here each class is defined in camel case above, while configruable parameters of each class are written in lower-case with underscores. 
 
-.. code-block:: python
+How is a Scooch configuration translated into code?
+---------------------------------------------------
 
-   from configipy import Config
-   
-   cfg = Config('./config.yaml') # <= Reads yaml and evaluated macros
-   cfg.hashid                    # <= Generates a hash ID unique to this exact configuration
-   cfg.json                      # <= Generates a json string for the config
-   cfg.Save('./saved_cfg.yaml')  # <= Dumps the config to a yaml files
-
-Given a configurable class hierarchy:
-
-.. code-block:: python
-
-   from configipy import Configurable
-
-   class Model(Configurable):
-
-      __PARAMS__ = {
-         'name': '<str> - A string describing the model'
-      }
- 
-      ...
-
-   class DenseNet(Model):
-
-      __PARAMS__ = {
-         'num_layers': '<int> - The number of dense layers',
-         'layer_width': '<int> - The number of neurons per layer',
-         'nonlinearity': '<str> - A string selecting the non-linearity used in this model'
-      }
-
-      __PARAM_DEFAULTS__ = {
-         'nonlinearity' = 'relu'
-      }
-
-      ...
-
-It may be used like so...
+Each class in this configuration corresponds directly to a scooch `Configurable` class in python code. For example the source code for the configuration above might have the following :code:`Configurable` class definitions in :code:`batcher.py`:
 
 .. code-block:: python
 
-   from configipy import class_instance_for_config
+    from scooch import Configurable
+    from scooch import Param
+    from scooch import ConfigurableParam
+    from scooch import ConfigList
 
-   cfg = Config('./config.yaml')
+    class SpectrogramFeature(Configurable):
 
-   # Checks for errors, evaluates default variables
-   model = DenseNet(cfg)
+        _hop_size = Param(int, default=128, doc="Number of samples between successive spectrogram frames")
+        _n_bins = Param(int, default=1024, doc="Number of frequency bins in the spectrogram")
 
-   # Classes can be inferred from configs...
-   model = class_instance_for_config(Model, cfg)
+        ...
 
-   # Gets the config dictionary the class was constructed with
-   model.cfg
+    class Augmenter(Configurable):
 
-   # Instance private variables are automatically populated from Config
-   model._num_layers
-   
+        _augmentations_per_sample = Param(int, default=3, doc="Number of augmented samples produced per input sample")
+
+        ...
+
+    class NoiseAugmenter(Augmenter):
+
+        _min_noise = Param(float, default=-10.0, doc="Minimum amount of noise added per sample, in dB")
+        _max_noise = Param(flaot, default=10.0, doc="Maximum amount of noise added per sample, in dB")
+
+        ...
+
+    class TranslationAugmenter(Augmenter):
+
+        displacement_variance = Param(int, default=50, doc="Number of elemets to rotationally translate the sample by")
+
+        ...
+
+    class Batcher(Configurable):
+        
+        _batch_size = Param(int, default=256, doc="Number of samples per batch")
+        _feature = ConfigurableParam(SpectrogramFeature, doc="The feature to produce samples of")
+        _augmenters = ConfigurableParam(ConfigList(Augmenter), doc="A list of data augmenters to sample from")
+        
+        ...
+
+In the above snippet, we can see abstraction, polymorphism, inheritance, and encapsulation employed within the classes, and their scooch parameters. Once configured, within each of the classes above the :code:`Param`\ s and :code:`ConfigurableParam`\ s will become accessible as attributes of the encapsulating :code:`Configurable` class instance. Furthermore the scooch :code:`Param` / :code:`ConfigurableParam` documentation will be added to the :code:`Configurable` class's doc string for accessibilty in any auto-generated documentation.
+
+With the class definitions and the :code:`config.yaml` file provided above, configuring the Batcher class and running the code in a script could be as simple as:
+
+.. code-block:: python
+
+    from scooch import Config
+    from batcher import Batcher
+
+    # Construct the object - this is all that is required to configure your class hierarchy.
+    a_batcher = Batcher(Config('./config.yaml'))
+
+    # Configurable values are assigned to class attributes
+    print(a_batcher._batch_size) # <= prints "128"
+
+    # Configurable attributes are constructed and assigned to class attributes
+    print(a_batcher._feature._n_bins) # <= prints "256"
+
+    # Use the class to produce a batch with the configured parameters
+    samples = a_batcher.get_batch()
+
+Index
+==================
+
+* :ref:`genindex`

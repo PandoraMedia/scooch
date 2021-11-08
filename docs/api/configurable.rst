@@ -1,0 +1,4 @@
+Configurable
+`````````````
+
+.. autoclass:: scooch.Configurable

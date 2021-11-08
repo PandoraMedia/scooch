@@ -1,0 +1,4 @@
+Param
+`````````````
+
+.. autoclass:: scooch.Param

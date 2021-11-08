@@ -1,0 +1,4 @@
+ConfigurableParam
+``````````````````````````
+
+.. autoclass:: scooch.ConfigurableParam

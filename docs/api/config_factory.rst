@@ -1,0 +1,4 @@
+ConfigFactory
+`````````````
+
+.. autoclass:: scooch.ConfigFactory

@@ -1,0 +1,4 @@
+ConfigList
+`````````````
+
+.. autoclass:: scooch.ConfigList
