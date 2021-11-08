@@ -3,7 +3,7 @@ Scooch
 
 **S**cooch **C**onfigures **O**bject **O**riented **C**lass **H**ierarchies for python. 
 
-The documentation for scooch can be found [here](http://mattcmccallum.com/scooch/docs)
+A good place to start with Scooch is at the documentation found [here](http://mattcmccallum.com/scooch/docs)
 
 Scooch is distributed via pypi, so it may be pip installed:
 
