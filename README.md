@@ -5,11 +5,14 @@ Scooch
 
 The documentation for scooch can be found [here](http://mattcmccallum.com/scooch/docs)
 
-Scooch is distributed via pypi, so it may be pip installed
+Scooch is distributed via pypi, so it may be pip installed:
 
 ```
 pip install scooch
 ```
+
+Overview
+===
 
 - [What is Scooch?](#what-is-scooch)
 - [Who needs Scooch?](#who-needs-scooch)
