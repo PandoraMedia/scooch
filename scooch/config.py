@@ -1,13 +1,18 @@
-"""
-Created 05-06-18 by Matthew C. McCallum
-"""
+# coding=utf-8
+# Copyright 2021 Pandora Media, LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
-
-# Local imports
-# None.
-
-# Third party module imports
-import yaml
 
 # Python standard library imports
 import os
@@ -15,6 +20,12 @@ import json
 import hashlib
 import re
 from datetime import datetime
+
+# Third party module imports
+import yaml
+
+# Local imports
+# None.
 
 
 # NOTE [matt.c.mccallum 03.19.20]: The below constant is evaluated at module import time and
@@ -82,7 +93,7 @@ class Config(dict):
             value: str - The provided value with the macro expression evaluated.
         """
         if 'PARENT' not in heirarchy.keys():
-            raise KeyError('No inheritable attribute "{}" found in Configipy heirarchy'.format(term))
+            raise KeyError('No inheritable attribute "{}" found in Scooch heirarchy'.format(term))
         return cls._inherit_recurse(heirarchy['PARENT'], term, value)
 
     @classmethod
@@ -99,7 +110,7 @@ class Config(dict):
         if 'PARENT' in heirarchy.keys():
             return cls._inherit_recurse(heirarchy['PARENT'], term, value)
         else:
-            raise KeyError('No inheritable attribute "{}" found in Configipy heirarchy'.format(term))
+            raise KeyError('No inheritable attribute "{}" found in Scooch heirarchy'.format(term))
 
     @classmethod
     def _datetime(cls, heirarchy, term, value):
@@ -136,13 +147,13 @@ class Config(dict):
             value: str - The provided value with the macro expression evaluated.
         """
         while type(value) is str and len(re.findall(r'\$\{(.*?)\}', value)):
-            func_name = re.findall(r'\$\{(.*?)\}', value)[0]  # NOTE [matt.c.mccallum 02.14.20]: Double evaluation of regex here, not the most efficient, but we're not concerned about efficiency in Configipy.
+            func_name = re.findall(r'\$\{(.*?)\}', value)[0]  # NOTE [matt.c.mccallum 02.14.20]: Double evaluation of regex here, not the most efficient, but we're less concerned about efficiency in Scooch as it is not runtime.
             if func_name in self._vars:
                 return self._vars[func_name]
             try:
                 func = self._VAR_FUNCS[func_name]
             except KeyError:
-                raise KeyError('No appropriate function "{}" defined in Configipy'.format(func_name))
+                raise KeyError('No appropriate function "{}" defined in Scooch'.format(func_name))
             value = func(heirarchy, term, value)
         return value
 

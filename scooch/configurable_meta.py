@@ -1,6 +1,17 @@
-"""
-Created 11-13-20 by Matt C. McCallum
-"""
+# coding=utf-8
+# Copyright 2021 Pandora Media, LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 
 # Python standard library imports
@@ -18,7 +29,7 @@ from .param import Param
 
 class ConfigurableMeta(type):
     """
-    Metaclass for configipy configurables. Enables programmatic modification
+    Metaclass for scooch configurables. Enables programmatic modification
     to the classes for things like programmatic class documentation.
     """
 
@@ -29,7 +40,7 @@ class ConfigurableMeta(type):
         Currently does three things:
             - Collects all parameters and parameter defaults through the Configurable inheretence hierarchy
             - Translates scooch configuration dictionaries into scooch parameter types and vice versa
-            - Updates the class doc string with information on its configipy parameters
+            - Updates the class doc string with information on its scooch parameters
         """
         # Get all base classes that are also ConfigurableMeta types
         meta_bases = [base for base in bases if type(base) is ConfigurableMeta]
@@ -92,7 +103,7 @@ class ConfigurableMeta(type):
         if len(list(params_dict.keys())):
             class_doc += textwrap.indent(textwrap.dedent("""
 
-            **Configipy Parameters**:
+            **Scooch Parameters**:
             """), '    ')
 
         for param, doc in params_dict.items():

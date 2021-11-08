@@ -1,6 +1,18 @@
-"""
-Created 02-03-21 by Matt C. McCallum
-"""
+# coding=utf-8
+# Copyright 2021 Pandora Media, LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 
 # Python standard library imports
 import importlib
@@ -13,8 +25,8 @@ import ruamel.yaml
 # Local imports
 from . import options
 import json
-from configipy import Configurable, config_factory
-from configipy import ConfigFactory
+from scooch import Configurable, config_factory
+from scooch import ConfigFactory
 
 
 @click.group()
@@ -63,7 +75,7 @@ def options(configurable, pymodule):
     subclss = configurable._all_subclasses()
     # TODO [matt.c.mccallum 02.03.21]: If there's no subclasses just print out the base class
     names = [sub.__name__ for sub in subclss]
-    docs = [sub.__PARAM_DOCS__ for sub in subclss]
+    docs = [sub.__doc__ for sub in subclss]
     result = ''
     for nm, dc in zip(names, docs):
         result += f'\n#\n# {nm}\n#\n'

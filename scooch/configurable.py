@@ -1,6 +1,17 @@
-"""
-Created 06-17-18 by Matt C. McCallum
-"""
+# coding=utf-8
+# Copyright 2021 Pandora Media, LLC.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
 
 
 # Python standard library imports
@@ -32,7 +43,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
         "config_namespace": "<str> - A namespace for the configuration, allowing grouping of configurations, or two configurations with otherwise identical configurations to be distinct."
     } # <= Parameters that can be specified in the class's configuration
 
-    __CONFIGURABLES__ = {} # <= Parameters that are Configipy configurables and will be constructed according to the configuration dicts specified in the Config
+    __CONFIGURABLES__ = {} # <= Parameters that are Scooch configurables and will be constructed according to the configuration dicts specified in the Config
 
     __PARAM_DEFAULTS__ = {
         "config_namespace": DEFAULT_NAMESPACE
@@ -116,10 +127,10 @@ class Configurable(object, metaclass=ConfigurableMeta):
             if isinstance(field, dict):
                 for key in field.keys():
                     if key not in cfg.keys():
-                        raise ValueError("Configipy config error: " + key + " value not found in " + self.__class__.__name__ + " object configuration")
+                        raise ValueError("Scooch config error: " + key + " value not found in " + self.__class__.__name__ + " object configuration")
                     self._verify_config(cfg[key], field[key])
             elif field not in cfg.keys():
-                raise ValueError("Configipy config error: " + field + " value not found in " + self.__class__.__name__ + " object configuration")
+                raise ValueError("Scooch config error: " + field + " value not found in " + self.__class__.__name__ + " object configuration")
 
     @property
     def cfg(self):
