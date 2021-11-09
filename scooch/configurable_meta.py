@@ -75,6 +75,8 @@ class ConfigurableMeta(type):
                     attrs['_'+attr_name] = Param(None, attrs['__PARAM_DEFAULTS__'].get(attr_name, None), attrs['__PARAMS__'][attr_name])
 
         # Update the docs
+        if not '__doc__' in attrs:
+            attrs['__doc__'] = ""
         attrs['__doc__'] = cls._populate_docs(attrs['__doc__'], attrs['__PARAMS__'], attrs['__PARAM_DEFAULTS__'], attrs['__CONFIGURABLES__'])
 
         # Rename the class if programmatically defined
