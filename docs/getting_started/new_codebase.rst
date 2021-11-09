@@ -112,9 +112,16 @@ At this point, it is simple to instantiate the class with the specified configur
         processed_kwargs = {key: arg for key, arg in kwargs.items() if arg}
         main(**processed_kwargs)
 
-For this example, we'll simply plot the data, though this could easily be extended to do something more useful like dump the data to :code:`.npy` files for training a model.
+For this example, we'll simply plot the data, though this could easily be extended to do something more useful like dump the data to :code:`.npy` files for training a model. Save this script as :code:`./batch_it.py`\ .
 
-Save this script as :code:`batch_it.py`, it can then be executed as:
+Note the code above expects a :code:`./data/test_data.wav` file by default. In this case you can use an example from the scooch repository by executing the following from the same directory as :code:`batch_it.py`\ .
+
+.. code-block:: bash
+
+    mdkir ./data
+    wget -O ./data/test_data.wav https://raw.githubusercontent.com/pandoramedia/scooch/main/examples/batcher_example/data/test_data.wav
+
+With the data in place, the script can then be executed as:
 
 .. code-block:: bash
 

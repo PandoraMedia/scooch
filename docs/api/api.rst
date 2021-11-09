@@ -16,3 +16,4 @@ Docs for scooch functions and classes are found here.
    config_collection
    configurable_factory
    config_factory
+   functions

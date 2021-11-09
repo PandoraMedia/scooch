@@ -4,3 +4,5 @@ ConfigCollection
 ``````````````````````````
 
 .. autoclass:: scooch.ConfigCollection
+    :members:
+    :undoc-members:
