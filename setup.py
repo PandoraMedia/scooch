@@ -72,10 +72,7 @@ the [documentation](www.mattcmccallum.com/scooch/docs).
 
 REQUIRED_PACKAGES = [
     'pyyaml==5.4.1',
-    'sphinx<3.0', # <= This version is held back because the `python-dev-tools` still depends on an older version of sphinx, yet,
-                  #    the latest version of pip continues to install the latest version of sphinx (even when the version is
-                  #    left open here), and the pip installation breaks with a conflicting sphinx dependency. Once pip and/or
-                  #    python-dev-tools is updated, we can remove this restriction
+    'sphinx',
     'sphinx_rtd_theme==0.5.1',
     'ruamel.yaml==0.16.12',
     'click==8.0.0a1'
