@@ -22,7 +22,7 @@ If you already have class definitions in your code that you want to make configu
 
 Scooch will create a derived class that has :code:`arg1` and :code:`arg2` as configurable parameters, with a default value of :code:`5` for :code:`arg2`. The derived class will take a Scooch :code:`Config` dictionary in the constructor argument, like any other Scooch :code:`Configurable`.
 
-Note that scooch will prefix :code:`Sch` to the class name to differentiate it from the non-configurable version of the class. For example, in your scooch :code:`config.yaml` file, the type of the configurized class above will be :code:`SchPreexistingClass`
+Note that scooch will prefix :code:`Scooch` to the class name to differentiate it from the non-configurable version of the class. For example, in your scooch :code:`config.yaml` file, the type of the configurized class above will be :code:`ScoochPreexistingClass`
 
 You can also add a class to an existing Scooch :code:`Configurable` hierarchy, by specifying a :code:`base_class` that is also a :code:`Configurable`.
 
@@ -51,7 +51,7 @@ We can now write a `./config.yaml` for this new class:
 
 .. code-block:: yaml
 
-    ConfBinaryCrossEntropy:
+    ScoochBinaryCrossEntropy:
         from_logits: True
         label_smoothing: 0.5
 

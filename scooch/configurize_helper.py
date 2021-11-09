@@ -55,7 +55,7 @@ def configurize(cls=None, base_class=None):
             """
             """
 
-            __SCOOCH_NAME__ = 'Configurable' + cls.__name__
+            __SCOOCH_NAME__ = 'Scooch' + cls.__name__
 
             # TODO [matt.c.mccallum 11.08.21]: Add type info here
             __PARAMS__ = {param: f'<> - Parameter derived by extending base class: {cls.__name__}' for param in inspect.signature(cls).parameters.keys()}
