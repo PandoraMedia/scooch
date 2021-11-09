@@ -41,7 +41,7 @@ class ConfigFactory(object):
         super().__init__()
         self._interactive = interactive
 
-    def CreateConfig(self, cls, level=0):
+    def create_config(self, cls, level=0):
         """
         Generates a configuration for this configurable, with all default values filled out,
         comments in place, and sub-configurables selected by the user (or placeholders are
@@ -101,7 +101,7 @@ class ConfigFactory(object):
 
         subclss = c_type._all_subclasses()
         if len(subclss) == 1:
-            return self.CreateConfig(subclss[0], level + 1)
+            return self.create_config(subclss[0], level + 1)
         else:
             if self._interactive:
                 inputting = True
@@ -113,7 +113,7 @@ class ConfigFactory(object):
                         if selection < 0: raise IndexError  # Prevent negative indexing in UI.
                         print(' ')
                         inputting = False
-                        return self.CreateConfig(subclss[selection], level + 1)
+                        return self.create_config(subclss[selection], level + 1)
                     except (ValueError, IndexError):
                         print(textwrap.indent(f'Invalid value, please enter an integer from 0 to {len(subclss)-1}', '  '*level))
                         print(' ')

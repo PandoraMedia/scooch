@@ -50,7 +50,7 @@ def construct(config, configurable, pymodule):
     except StopIteration:
         print(f"Error: No Configurable named {configurable} found (after importing: {pymodule})")
         return
-    cfg = ConfigFactory(True).CreateConfig(configurable)
+    cfg = ConfigFactory(True).create_config(configurable)
     if config != None and len(config) > 0:
         with open(config, 'w') as f:
             ruamel.yaml.YAML().dump(cfg, f)

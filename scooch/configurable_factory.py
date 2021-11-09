@@ -33,7 +33,7 @@ class ConfigurableFactory( object ):
     A Factory for constructing scooch configurables for a given configuration.
     """
 
-    def Construct(self, cfg_type, cfg):
+    def construct(self, cfg_type, cfg):
         """
         This will construct and return a Scooch configurable of a given cfg_type according to the parameterization
         specified in the cfg.
@@ -50,9 +50,9 @@ class ConfigurableFactory( object ):
         # TODO [matt.c.mccallum 01.05.21]: TYPE CHECK THAT THE CONFIG LISTS AND DICTS MATCH UP WITH THE `cfg_type` HERE.
         # TODO [matt.c.mccallum 11.04.21]: Raise a helpful error if we don't get a config list or config collection in the config dict, when we expect one.
         if isinstance(cfg_type, ConfigCollection):
-            output_obj = {name: self.Construct(cfg_type.subtype, cfg) for name, cfg in cfg.items()}
+            output_obj = {name: self.construct(cfg_type.subtype, cfg) for name, cfg in cfg.items()}
         elif isinstance(cfg_type, ConfigList):
-            output_obj = [self.Construct(cfg_type.subtype, each_cfg) for each_cfg in cfg]
+            output_obj = [self.construct(cfg_type.subtype, each_cfg) for each_cfg in cfg]
         elif type(cfg_type) is ConfigurableMeta:
             # TODO [matt.c.mccallum 01.13.21]: Move the below method to a member function once we have updated all other codebases to use the ConfigurableFactory instead.
             output_obj = class_instance_for_config(cfg_type, Config(cfg))

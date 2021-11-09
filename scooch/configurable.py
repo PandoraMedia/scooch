@@ -78,11 +78,11 @@ class Configurable(object, metaclass=ConfigurableMeta):
         self._config_factory = ConfigurableFactory()
         self._config_instances = {}
         for param_name, configurable in self.__CONFIGURABLES__.items():
-            obj = self._config_factory.Construct(configurable, self._cfg[self.__class__.__name__][param_name])
+            obj = self._config_factory.construct(configurable, self._cfg[self.__class__.__name__][param_name])
             self._config_instances[param_name] = obj
 
     @classmethod
-    def PopulateDefaults(cls, cfg):
+    def populate_defaults(cls, cfg):
         """
         Populates the defaults for this Configurable in the provided cfg, without actually constructing it.
 

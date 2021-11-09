@@ -36,12 +36,12 @@ configuration files into object oriented class hierarchies.
 
 # Who needs Scooch?
 
-Scooch is useful for people who need a good interface to enable "tweakability" 
-in their code. ML practitioners are a good example. They typically write code 
-that is intended to be continuously experimented with and adjusted in response 
-to observations from running the code. As such, it is useful to abstract these 
-tweakable parameters from the code into a config file, providing three major 
-benefits:
+Scooch is useful for people who need an accessible interface to enable 
+tweakability in their code. ML practitioners are a good example. They 
+typically write code that is intended to be continuously experimented with and 
+adjusted in response to observations from running the code. As such, it is useful 
+to abstract these tweakable parameters from the code into a config file, providing 
+three major benefits:
 
  - The config file provides a centralized location for adjustable parameters of 
  interest in the code, improving iteration and workflow.
@@ -54,7 +54,7 @@ benefits:
 # Why use Scooch?
 
 There are many other projects out there that endeavor to translate config files 
-into parameters in your code, for example:
+into parameters in python code, for example:
 
  - [Gin](https://github.com/google/gin-config)
  - [Sacred](https://sacred.readthedocs.io/en/stable/index.html)
@@ -66,7 +66,7 @@ hierarchies. This means configurations can benefit from object oriented concepts
 such as Inheretance, Encapsulation, Abstraction and Polymorphism.
 
 For more information about how to use, and why to use Scooch. Please refer to 
-the [documentation](www.mattcmccallum.com/scooch/docs).
+the [documentation](http://www.mattcmccallum.com/scooch/docs).
 """
 
 
@@ -105,11 +105,11 @@ setuptools.setup(
         'make_reqs': MakeReqsCommand
     },
     name='scooch',
-    version='0.0.9',
+    version='0.1.0',
     description='A python module for configuring hierarchical class structures in yaml with defaults',
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/PandoraMedia/scooch",
+    url="http://www.mattcmccallum.com/scooch/docs",
     author="Matt C. McCallum",
     author_email="scooch@mattcmccallum.com",
     classifiers=[
@@ -141,6 +141,7 @@ setuptools.setup(
     install_requires=REQUIRED_PACKAGES,
     python_requires='>=3.6',
     packages=setuptools.find_packages(),
+    include_package_data=True,
 
     # CLI
     entry_points = {

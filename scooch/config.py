@@ -195,7 +195,7 @@ class Config(dict):
         if 'PARENT' in parent.keys():
             del parent['PARENT']
 
-    def Save(self, config_file):
+    def save(self, config_file):
         """
         Saves a the configuration fields in yaml format to disk.
 
