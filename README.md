@@ -3,7 +3,7 @@ Scooch
 
 **S**cooch **C**onfigures **O**bject **O**riented **C**lass **H**ierarchies for python. 
 
-A good place to start with Scooch is at the documentation found [here](http://mattcmccallum.com/scooch/docs)
+A good place to start with Scooch is at the documentation found [here](http://mattcmccallum.com/scooch/docs).
 
 Scooch is distributed via pypi, so it may be pip installed:
 
@@ -23,27 +23,33 @@ Overview
 What is Scooch?
 ===
 
-Scooch is a recursive acronym for **S**cooch **C**onfigures **O**bject **O**riented **C**lass **H**ierarchies, and that's exactly what this package does. It is a configuration package for python codebases that simplifies the problem of configuring parameters in python code by translating YAML configuration files into object oriented class hierarchies.
+Scooch is a recursive acronym for **S**cooch **C**onfigures **O**bject **O**riented **C**lass **H**ierarchies, and that's what this package does. It is a configuration package for python codebases that simplifies the problem of configuring parameters in python code by translating YAML configuration files into object oriented class hierarchies.
 
 Who needs Scooch?
 ===
 
-Scooch is useful for people who need a good interface to enable "tweakability" in their code. ML practitioners are a good example. They typically write code that is intended to be continuously experimented with and adjusted in response to observations from running the code. As such, it is useful to abstract these tweakable parameters from the code into a config file, providing three major benefits:
+Scooch is useful for people who need an accessible interface to enable tweakability in their code. ML practitioners are a good example. They typically write code that is intended to be continuously experimented with and adjusted in response to observations from running the code. As such, it is useful to abstract these tweakable parameters from the code into a config file, providing three major benefits:
 
- - The config file provides a centralized location for adjustable parameters of interest in the code, improving iteration and workflow.
- - Loading, saving and adjusting the configuration of your code is separated from the many other working variables and data structures that may exist in code.
- - The configuration of any part of the code can be hashed, logged, and indexed, to provide a record of the code configuration at any one time.
+ - The config file provides a centralized location for adjustable parameters of 
+ interest in the code, improving iteration and workflow.
+ - Loading, saving and adjusting the configuration of your code is separated 
+ from the many other working variables and data structures that may exist in 
+ code.
+ - The configuration of any part of the code can be hashed, logged, and indexed, 
+ to provide a record of the code configuration at any one time.
 
 Why use Scooch?
 ===
 
-There are many other projects out there that endeavor to translate config files into parameters in your code, for example:
+There are many other projects out there that endeavor to translate config files into parameters in python code, for example:
 
  - [Gin](https://github.com/google/gin-config)
  - [Sacred](https://sacred.readthedocs.io/en/stable/index.html)
  - [Hydra](https://hydra.cc/)
 
-However, what makes Scooch different is that it not only translates config parameters into variables in your code, but into object oriented class hierarchies. This means configurations can benefit from object oriented concepts such as Inheretance, Encapsulation, Abstraction and Polymorphism. The benefits of Scooch are outlined in more detail in the [Benefits of Scooch](http://www.mattcmccallum.com/scooch/docs/benefits_of_scooch.html) section of the [docs](http://www.mattcmccallum.com/scooch/docs).
+However, what makes Scooch different is that it not only translates config parameters into variables in your code, but into object oriented class hierarchies. This means configurations can benefit from object oriented concepts such as Inheretance, Encapsulation, Abstraction and Polymorphism.
+
+ The benefits of Scooch are outlined in more detail in the [Why Object Oriented Configs?](http://www.mattcmccallum.com/scooch/docs/benefits_of_scooch.html) section of the [docs](http://www.mattcmccallum.com/scooch/docs).
 
 What does a Scooch config look like?
 ===
@@ -96,7 +102,7 @@ class Augmenter(Configurable):
 class NoiseAugmenter(Augmenter):
 
     _min_noise = Param(float, default=-10.0, doc="Minimum amount of noise added per sample, in dB")
-    _max_noise = Param(flaot, default=10.0, doc="Maximum amount of noise added per sample, in dB")
+    _max_noise = Param(float, default=10.0, doc="Maximum amount of noise added per sample, in dB")
 
     ...
 

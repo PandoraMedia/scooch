@@ -3,6 +3,8 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
+.. _home:
+
 Scooch Documentation
 =====================================
 
@@ -15,15 +17,17 @@ Scooch Documentation
    getting_started/getting_started
    api/api
 
+The source code for Scooch can be found `here <https://github.com/PandoraMedia/scooch>`_\ .
+
 What is Scooch?
 ---------------
 
-Scooch is a recursive acronym for **S**\ cooch **C**\ onfigures **O**\ bject **O**\ riented **C**\ lass **H**\ ierarchies, and that's exactly what this package does. It is a configuration package for python codebases that simplifies the problem of configuring parameters in python code by translating YAML configuration files into object oriented class hierarchies.
+Scooch is a recursive acronym for **S**\ cooch **C**\ onfigures **O**\ bject **O**\ riented **C**\ lass **H**\ ierarchies, and that's what this package does. It is a configuration package for python codebases that simplifies the problem of configuring parameters in python code by translating YAML configuration files into object oriented class hierarchies.
 
 Who needs Scooch?
 -----------------
 
-Scooch is useful for people who need a good interface to enable "tweakability" in their code. ML practitioners are a good example. They typically write code that is intended to be continuously experimented with and adjusted in response to observations from running the code. As such, it is useful to abstract these tweakable parameters from the code into a config file, providing three major benefits:
+Scooch is useful for people who need an interface to enable tweakability in their code. ML practitioners are a good example. They typically write code that is intended to be continuously experimented with and adjusted in response to observations from running the code. As such, it is useful to abstract these tweakable parameters from the code into a config file, providing three major benefits:
 
 * The config file provides a centralized location for adjustable parameters of interest in the code, improving iteration and workflow.
 * Loading, saving and adjusting the configuration of your code is separated from the many other working variables and data structures that may exist in code.
@@ -38,7 +42,7 @@ There are many other projects out there that endeavor to translate config files 
 * `Sacred <https://sacred.readthedocs.io/en/stable/index.html>`_
 * `Hydra <https://hydra.cc/>`_
 
-However, what makes Scooch different is that it not only translates config parameters into variables in your code, but into object oriented class hierarchies. This means configurations can benefit from object oriented concepts such as Inheretance, Encapsulation, Abstraction and Polymorphism. The benefits of Scooch are outlined in more detail in the :ref:`benefits` section.
+However, what makes Scooch different is that it not only translates config parameters into variables in your code, but into object oriented class hierarchies. This means configurations can benefit from object oriented concepts such as inheretance, encapsulation, abstraction and polymorphism. The benefits of such an approach are outlined in more detail in the :ref:`benefits` section.
 
 What does a Scooch config look like?
 ------------------------------------
@@ -67,7 +71,7 @@ Here each class is defined in camel case above, while configruable parameters of
 How is a Scooch configuration translated into code?
 ---------------------------------------------------
 
-Each class in this configuration corresponds directly to a scooch `Configurable` class in python code. For example the source code for the configuration above might have the following :code:`Configurable` class definitions in :code:`batcher.py`:
+Each class in this configuration corresponds directly to a Scooch :code:`Configurable` class in python code. For example, the source code for the configuration above might have the following :code:`Configurable` class definitions in :code:`batcher.py`:
 
 .. code-block:: python
 
@@ -92,7 +96,7 @@ Each class in this configuration corresponds directly to a scooch `Configurable`
     class NoiseAugmenter(Augmenter):
 
         _min_noise = Param(float, default=-10.0, doc="Minimum amount of noise added per sample, in dB")
-        _max_noise = Param(flaot, default=10.0, doc="Maximum amount of noise added per sample, in dB")
+        _max_noise = Param(float, default=10.0, doc="Maximum amount of noise added per sample, in dB")
 
         ...
 
@@ -110,9 +114,9 @@ Each class in this configuration corresponds directly to a scooch `Configurable`
         
         ...
 
-In the above snippet, we can see abstraction, polymorphism, inheritance, and encapsulation employed within the classes, and their scooch parameters. Once configured, within each of the classes above the :code:`Param`\ s and :code:`ConfigurableParam`\ s will become accessible as attributes of the encapsulating :code:`Configurable` class instance. Furthermore the scooch :code:`Param` / :code:`ConfigurableParam` documentation will be added to the :code:`Configurable` class's doc string for accessibilty in any auto-generated documentation.
+In the above snippet, we can see abstraction, polymorphism, inheritance, and encapsulation employed within the classes, and their Scooch parameters. Once configured, within each of the classes above the :code:`Param`\ s and :code:`ConfigurableParam`\ s will become accessible as attributes of the encapsulating :code:`Configurable` class instance. Furthermore, the Scooch :code:`Param` / :code:`ConfigurableParam` documentation will be added to the :code:`Configurable` class's doc string for accessibilty in any auto-generated documentation.
 
-With the class definitions and the :code:`config.yaml` file provided above, configuring the Batcher class and running the code in a script could be as simple as:
+With the class definitions and the :code:`config.yaml` file provided above, configuring the :code:`Batcher` class and running the code in a script could be as simple as:
 
 .. code-block:: python
 

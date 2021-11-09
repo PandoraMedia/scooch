@@ -1,6 +1,6 @@
 .. _benefits:
 
-Benefits of Scooch
+Why Object Oriented Configs?
 --------------------------------
 
 Many python configuration libraries can help the type of iterative workflows practiced in machine learning, by centralizing the configuration of your iterations to a configuration file. However, because Scooch is object oriented, there are a number of benefits that we believe make it a particularly good choice.
@@ -8,7 +8,11 @@ Many python configuration libraries can help the type of iterative workflows pra
 Plug and play code configuration
 `````````````````````````````````
 
-Because the config file corresponds directly to the types in a class hierarchy, the selection of subclasses in that code can be configured right there in the config file. This is useful when you implement several different methodologies for doing a single task. For example, an ML practitioner may implement several different ways of augmenting data within a class that creates create mini batches for a gradient descent algorithm. Those "augmenters" may do things like add noise, translate, and rotate the data. That practitioner could write an :code:`Augmenter` base class, and several subclasses :code:`NoiseAugmenter`\ , :code:`TranslationAugmenter` and :code:`PitchShiftAugmenter`\ . Each of these subclasses will be selectable and configurable by adjusting the configuration file, without any changes in the code. Furthermore, several configurations of the same class could be created simply by adjusting the config file. This mirrors the benefits of abstraction and polymorphism in OOP. For example, a :code:`Batcher` with many augmenters might be configured like so:
+Because the config file corresponds directly to the types in a class hierarchy, the selection of subclasses in that code can be configured right there in the config file. This is useful when you implement several different methodologies for doing a single task. 
+
+For example, an ML practitioner may implement several different ways of augmenting data within a class that creates create mini batches for a gradient descent algorithm. Those "augmenters" may do things like add noise, translate, and rotate the data. That practitioner could write an :code:`Augmenter` base class, and several subclasses :code:`NoiseAugmenter`\ , :code:`TranslationAugmenter` and :code:`PitchShiftAugmenter`\ . Each of these subclasses will be selectable and configurable by adjusting the configuration file, without any changes in the code. 
+
+Furthermore, several configurations of the same class could be created simply by adjusting the config file. This mirrors the benefits of abstraction and polymorphism in OOP. For example, a :code:`Batcher` with many augmenters might be configured like so:
 
 .. code-block:: yaml
 
@@ -34,14 +38,14 @@ The ability to select and choose functionality in the code by adjusting your con
 Automatic construction of class hierarchies
 ````````````````````````````````````````````````````
 
-Because your config file describes the class hierarchy itself, constructing a class hierarchy with a Scooch config file is very simple. The config file provides enough information to construct the class, assign parameters, and furthermore, construct any encapsulated classes within. As we see in the example in the section [How is a Scooch configuration translated into code?](#how-is-a-scooch-configuration-translated-into-code), construction of the class hieararchy is performed in a single line of code, with no adjustments necessary to each of the :code:`Configurable` class's constructors. 
+Because your config file describes the class hierarchy itself, constructing a class hierarchy with a Scooch config file is very simple. The config file provides enough information to construct the class, assign parameters, and furthermore, construct any encapsulated classes within. As we see in the examples on the :ref:`home` homepage, construction of the class hieararchy is performed in a single line of code, with no adjustments necessary to each of the :code:`Configurable` class's constructors. 
 
 This is difficult to do with other python configuration packages that are not object oriented, in that, they do not construct the configured components, simply translate parameters from config files to variables in code. Furthermore, there may be no standard around how and where the config values are assigned in the code, leading to config files that have a non-intuitive mapping to the code itself. By describing class hierarchies directly in config files, we can avoid class construction boilerplate, and avoid config files that are mapped to code like "sphagetti".
 
 Encourages modular code
 ``````````````````````````
 
-Because Scooch is fundamentally object oriented, it encourages thinking about code configurations in terms of types and parameters. This practice encourages a developer to think about each of the types and how they interface with both the configuration and any classes that use them, thereby making reusable modules (i.e., classes) and their respective configurations in the code more common, rather than script / purpose specific configurations that may have no interface. After using Scooch for some time, it can become common to write the :code:`config.yaml` file, before implementing the classes it describes, as a way of drafting a class hierarchy's structure.
+Because Scooch is fundamentally object oriented, it encourages thinking about code configurations in terms of types and parameters. This practice encourages a developer to think about each of the :code:`Configurable` types and how they interface with both the configuration and any classes that use them, thereby making reusable modules (i.e., classes) and their respective configurations in the code more common, rather than script / purpose specific configurations that may have no interface. After using Scooch for some time, it can become common to write the :code:`config.yaml` file, before implementing the classes it describes, as a way of drafting a class hierarchy's structure.
 
 Simplifies code reuse
 ``````````````````````````
@@ -79,7 +83,7 @@ Often in ML pipelines you will want to reuse functionality (and hence configurat
         _model = ConfigurableParam(Model, doc="A trained model for analyzing features")
         ...
 
-Both classes reuse the same :code:`FeatureTransform` interface, and in the scooch :code:`config.yaml` file, we can reuse the same configuration:
+Both classes reuse the same :code:`FeatureTransform` interface, and in the Scooch :code:`config.yaml` file, we can reuse the same configuration:
 
 .. code-block:: yaml
 
@@ -109,7 +113,7 @@ Because the parameters in a configuration file correspond directly to classes an
 Configuration validation
 ``````````````````````````
 
-Because Scooch is directly constructing class hierarchies from config files, it knows the expected structure of your class hierarchy, and the types therein. This enables useful error messages that describe the incompatibility between your configuration and the code you are configuring. Given that the config files are human written and human adjusted, this is not uncommon and can improve workflow.
+Because Scooch is directly constructing class hierarchies from config files, it knows the expected structure of your class hierarchy, and the types therein. This enables useful error messages that describe the incompatibility between your configuration and the code you are configuring. Given that the config files are human written and human adjusted, this is not uncommon, and can improve workflow.
 
 For example, if you specify a configuration for an incorrect Configurable type, e.g.,
 
@@ -129,7 +133,7 @@ an error message will be logged like so:
     Candidates were: ['PitchShiftAugmenter', 'NoiseAugmenter', 'TranslationAugmenter']
     Config requested: ['NiseAugmenter']
 
-If you forget to insert a required parameter, or mispell its name in the configuration file, you will get an error message. For example, if you mispell :code:`min_noise` as :code:`min_nois` for the NoiseAugmenter class, you will get the following error:
+If you forget to insert a required parameter, or mispell its name in the configuration file, you will get an error message. For example, if you mispell :code:`min_noise` as :code:`min_nois` for the :code:`NoiseAugmenter` class, you will get the following error:
 
 .. code-block:: none
 
@@ -174,7 +178,7 @@ For example, the docstring for a Scooch configurable :code:`Batcher` class might
 A CLI for exploring class hierarchies
 ```````````````````````````````````````
 
-As codebases that use Scooch grow, the number of classes and configuration options can become daunting for on-boarding new users of that codebase. To help with this, Scooch offers some CLI options for exploring configurations, classes and options in a codebase.
+As codebases that use Scooch grow, the number of classes and configuration options can become daunting for on-boarding new users to that codebase. To help with this, Scooch offers some CLI options for exploring configurations, classes and options in a codebase.
 
 If you want to explore all subclass "options" for a given base class, you can use the following command:
 
@@ -184,10 +188,10 @@ If you want to explore all subclass "options" for a given base class, you can us
 
 Where the :code:`-m` option specifies a module that the Scooch :code:`Configurable` hierarchy is defined in (must be in your :code:`PYTHONPATH`), and :code:`-f` specifies the :code:`Configurable` type for which you want to view the options for.
 
-If you want to construct a skeleton config file for a given class, you can use the scooch wizard (currently in alpha):
+If you want to construct a skeleton config file for a given class, you can use the Scooch wizard (currently in alpha):
 
 .. code-block:: bash
 
     scooch construct -c ./config.yaml -f Batcher -m batcher
 
-The wizard will prompt for selecting options for any :code:`Configurable` attributes in the :code:`Batcher` class. Once complete ./config.yaml will be produced, populated by defaults and documentation on each of the parameters.
+The wizard will prompt for selecting options for any :code:`Configurable` attributes in the :code:`Batcher` class. Once complete :code:`./config.yaml` will be produced, populated by defaults and documentation on each of the parameters.

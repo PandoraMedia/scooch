@@ -1,7 +1,7 @@
 Getting Started
 ---------------
 
-For help on getting started with scooch, explore the docs below.
+For help on getting started with Scooch, explore the docs below.
 
 To understand how Scooch works, it is most helpful to explore the :ref:`new_codebase` section, even if you plan to apply Scooch to an existing codebase.
 

@@ -22,7 +22,7 @@ If you already have class definitions in your code that you want to make configu
 
 Scooch will create a derived class that has :code:`arg1` and :code:`arg2` as configurable parameters, with a default value of :code:`5` for :code:`arg2`. The derived class will take a Scooch :code:`Config` dictionary in the constructor argument, like any other Scooch :code:`Configurable`.
 
-Note that scooch will prefix :code:`Scooch` to the class name to differentiate it from the non-configurable version of the class. For example, in your scooch :code:`config.yaml` file, the type of the configurized class above will be :code:`ScoochPreexistingClass`
+Note that Scooch will prefix :code:`Scooch` to the class name to differentiate it from the non-configurable version of the class. For example, in your Scooch :code:`config.yaml` file, the type of the configurized class above will be :code:`ScoochPreexistingClass`
 
 You can also add a class to an existing Scooch :code:`Configurable` hierarchy, by specifying a :code:`base_class` that is also a :code:`Configurable`.
 
@@ -38,7 +38,7 @@ Configurizing Third-Party Classes
 
 If the class you want to configure with Scooch belongs to a code base you are not a contributor for, you will have no access to modify the class definition. One way to make a third party class Scooch configurable is to use :code:`scooch.configurize`.
 
-For example, if you are developing an ML training pipeline, you may want to use the classes in `tensorflow.keras.losses`, and parameterize them in your scooch config file. Making a single third party class configurable is as easy as:
+For example, if you are developing an ML training pipeline, you may want to use the classes in :code:`tensorflow.keras.losses`, and parameterize them in your Scooch config file. Making a single third party class configurable is as easy as:
 
 .. code-block:: python
 
@@ -47,7 +47,7 @@ For example, if you are developing an ML training pipeline, you may want to use 
 
     configurable_class = configurize(tf.keras.losses.BinaryCrossEntropy)
 
-We can now write a `./config.yaml` for this new class:
+We can now write a :code:`./config.yaml` for this new class:
 
 .. code-block:: yaml
 
@@ -67,7 +67,7 @@ The new configurable loss may be instantiated and used like any other keras loss
 
     ...
 
-This will create a single configurable class that is currently isolated to it's own inheritance hierarchy. Perhaps you want to create a range of `Loss` functions, some custom and some derived from a third party, that will be selectable in your `config.yaml` like any other Scooch type. Scooch can do this through multiple inheritence, by adding a user defined Scooch base class to each :code:`congigurize`\ d third party class:
+This will create a single configurable class that is currently isolated to it's own inheritance hierarchy. Perhaps you want to create a range of :code:`Loss` functions, some custom and some derived from a third party, that will be selectable in your :code:`config.yaml` like any other Scooch type. Scooch can do this through multiple inheritence, by adding a user defined Scooch base class to each :code:`congigurize`\ d third party class:
 
 
 For example, to add all keras loss functions to our Scooch hierarchy we could do the following:
@@ -105,7 +105,7 @@ With the above code, classes can now be defined with a :code:`ConfigurableParam`
 Configurizing Code that is not Object Oriented
 ''''''''''''''''''''''''''''''''''''''''''''''
 
-We are currently working on extending scooch to configure functional code.
+We are currently working on extending Scooch to configure functional code.
 
 If you're convinced by the arguments in :ref:`benefits` section, you may want to start trying to structure your code using object oriented programming.
 

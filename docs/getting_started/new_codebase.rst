@@ -3,7 +3,7 @@
 Getting Started with a New Codebase
 ```````````````````````````````````````
 
-If you are starting a new project, scooch is an easy way to keep your code structured and configurable as you develop. This example provides a walkthrough in starting a new Scooch configurable codebase for creating mini-batches to be used in a gradient descent algorithm. It highlights many of the features and benefits of using Scooch.
+If you are starting a new project, Scooch is an easy way to keep your code structured and configurable as you develop. This example provides a walkthrough in starting a new Scooch configurable codebase for creating mini-batches to be used in a gradient descent algorithm. It highlights many of the features and benefits of using Scooch.
 
 A completed version of this example is available in the `examples <https://github.com/PandoraMedia/scooch/tree/main/examples/batcher_example>`_ provided on github.
 
@@ -23,7 +23,7 @@ Let's also create a directory to work in:
 1 - Parameterize a class
 ''''''''''''''''''''''''''
 
-A core componet of this code will be a configurable :code:`Batcher` class. To make a new scooch configurable class, you can simply inherit from :code:`scooch.Configurable` and define some parameters on that class's definition. For the :code:`Batcher` class, we'll start simple by placing the following class in :code:`./batcher.py`:
+A core componet of this code will be a configurable :code:`Batcher` class. To make a new Scooch configurable class, you can simply inherit from :code:`scooch.Configurable` and define some parameters on that class's definition. For the :code:`Batcher` class, we'll start simple by placing the following class in :code:`./batcher.py`:
 
 .. code-block:: python
 
@@ -118,7 +118,7 @@ Note the code above expects a :code:`./data/test_data.wav` file by default. In t
 
 .. code-block:: bash
 
-    mdkir ./data
+    mkdir ./data
     wget -O ./data/test_data.wav https://raw.githubusercontent.com/pandoramedia/scooch/main/examples/batcher_example/data/test_data.wav
 
 With the data in place, the script can then be executed as:
@@ -127,12 +127,12 @@ With the data in place, the script can then be executed as:
 
     python ./batch_it.py --config ./config.yaml --data ./data/test_data.wav
 
-There we have it, a script that uses scooch to configure a class for producing mini-batches. This can be done simply with many different python config libraries. Next we'll look into some of the benefits of Scooch's object oriented approach in particular.
+There we have it, a script that uses Scooch to configure a class for producing mini-batches. This can be done simply with many different python config libraries. Next we'll look into some of the benefits of Scooch's object oriented approach in particular.
 
 4 - Encapsulation
 ''''''''''''''''''''''''''
 
-One of the primary benefits of scooch is that it constructs not only classes, but entire class hierarchies, with minimal code. Perhaps we want the :code:`Batcher` class above to produce augmentations of the data source it is reading from. 
+One of the primary benefits of Scooch is that it constructs not only classes, but entire class hierarchies, with minimal code. Perhaps we want the :code:`Batcher` class above to produce augmentations of the data source it is reading from. 
 
 To get started it might make sense to place our :code:`Batcher` class in a python package. We can do this by organizing our previous files like so in the following directories:
 
@@ -149,7 +149,7 @@ and place the following in the :code:`./batcher/__init__.py` file:
 
     from .batcher import Batcher
 
-For data augmentations we'll like want to parameterize that augmentation itself. Let's create an augmenter class that takes in some feature data and augments it. Put the following in the file :code:`./batcher/augmenters.py`
+For data augmentations we'll want to parameterize that augmentation itself. Let's create an augmenter class that takes in some feature data and augments it. Put the following in the file :code:`./batcher/augmenters.py`\ .
 
 .. code-block:: python
 
@@ -196,7 +196,7 @@ We can now employ this new :code:`Configurable` inside the :code:`Batcher` class
 
     ...
 
-Upon instantiation, this class will be constructed and assigned to the :code:`_augmenter` attribute, so using it is simple. We can adjust the :code:`get_batch` method of :code:`Batcher` to do this:
+Upon instantiation of :code:`Batcher`, this class will be constructed and assigned to the :code:`_augmenter` attribute, so using it is simple. We can adjust the :code:`get_batch` method of :code:`Batcher` to do this:
 
 .. code-block:: python
 
@@ -224,7 +224,7 @@ We can now adjust the :code:`./config.yaml` to configure the new :code:`Configur
                 min_noise: -5.0
                 max_noise: 5.0
 
-Without any changes to the :code:`./batch_it.py` script, scooch will construct the new class hierarchy based on the parameters and configuration, to produce noise augmented samples. Try running the following again:
+Without any changes to the :code:`./batch_it.py` script, Scooch will construct the new class hierarchy based on the parameters and configuration, to produce noise augmented samples. Try running the following again:
 
 .. code-block:: bash
 
@@ -340,7 +340,7 @@ By running :code:`batch_it.py` again, we will see that there is no longer additi
 7 - Explore Scooch hierarchies with the CLI
 ''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-As codebases and class hierarchies grow, the number of configuration options can become daunting. To help with onboarding to a codebase that uses scooch, you can view the options for a given Configurable base class as follows:
+As codebases and class hierarchies grow, the number of configuration options can become daunting. To help with onboarding to a codebase that uses Scooch, you can view the options for a given :code:`Configurable` base class as follows:
 
 .. code-block:: bash
 
@@ -348,16 +348,16 @@ As codebases and class hierarchies grow, the number of configuration options can
 
 This will print out the doc strings for all subclasses of :code:`Augmenter` in the :code:`batcher` module, including the Scooch parameter information.
 
-Note that any module here will have to be installed or in your python path. If you receive a :code:`ModuleNotFoundError`, you can add the batcher module to your python path like so:
+Note that any module here will have to be installed or in your python path. If you receive a :code:`ModuleNotFoundError`, you can add the :code:`batcher` module to your python path like so:
 
 .. code-block:: bash
 
     export PYTHONPATH=$PYTHONPATH:`pwd`
 
-Furthermore, the structure of configuration for a :code:`Configurable` can become quite complex. To help new developers, it is recommender to include an example :code:`config.yaml` file in your codebase. Alternatively, there is a wizard to produce :code:`config.yaml` files for a given class, via the CLI.
+The structure of configuration for a :code:`Configurable` can become quite complex. To help new developers, it is recommender to include an example :code:`config.yaml` file in your codebase. Alternatively, there is a wizard to produce :code:`config.yaml` files for a given class, via the CLI.
 
 .. code-block:: bash
 
     scooch construct -c ./default_config.yaml -m batcher -f Batcher
 
-This will prompt for the type of each :code:`ConfigurableParam` and construct a configuration for the :code:`Batcher` class in the :code:`batcher` module and place it in the file :code:`./default_config.yaml`.
+This will prompt for the type of each :code:`ConfigurableParam` in the class hierarchy, and construct a configuration for the :code:`Batcher` class in the :code:`batcher` module and place it in the file :code:`./default_config.yaml`.
