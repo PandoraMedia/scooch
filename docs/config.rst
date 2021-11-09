@@ -1,0 +1,4 @@
+Config
+*******
+
+.. autoclass:: configipy.Config

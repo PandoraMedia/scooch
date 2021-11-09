@@ -1,0 +1,4 @@
+Configurable
+*************
+
+.. autoclass:: configipy.Configurable

@@ -1,0 +1,23 @@
+#
+# Created by Matt C. McCallum 02.14.2020
+#
+
+Experiment:
+  experiment_id: test-experiment-${datetime}
+  other_field: 1
+  test_cfg1:
+    cfg1_value: abc
+    test_cfg1a:
+      experiment_id: ${inherit}
+      cfg1a_value: 123
+  test_cfg2:
+    test_cfg1b:
+      cfg1b_value: 0.5
+      output:
+        output_cfg:
+          cfg1b_value: ${inherit}
+          experiment_id: ${inherit}
+      input:
+        input_cfg:
+          input_cfg_value: input_value
+          cfg1b_value: ${inherit}
