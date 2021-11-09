@@ -78,7 +78,7 @@ class ConfigurableMeta(type):
         attrs['__doc__'] = cls._populate_docs(attrs['__doc__'], attrs['__PARAMS__'], attrs['__PARAM_DEFAULTS__'], attrs['__CONFIGURABLES__'])
 
         # Rename the class if programmatically defined
-        if attrs['__SCOOCH_NAME__'] is not None:
+        if '__SCOOCH_NAME__' in attrs and attrs['__SCOOCH_NAME__'] is not None:
             name = attrs['__SCOOCH_NAME__']
 
         return super(ConfigurableMeta, cls).__new__(cls, name, bases, attrs)

@@ -16,6 +16,7 @@
 
 # Python standard library imports
 import inspect
+import functools
 
 # Third party imports
 # None.
@@ -24,7 +25,7 @@ import inspect
 from .configurable import Configurable
 
 
-def configurize(cls):
+def configurize(cls=None, base_class=None):
     """
     Takes a class and makes it scooch configurable. This will prepend "Conf" to the class name
     to distinguish it from the class definition. The returned / transformed class will be accessible
@@ -34,26 +35,46 @@ def configurize(cls):
     Args:
         cls: class - A python class that will be made configurable via scooch.
 
+        base_class: class - A python class that the newly minted scooch configurable class will inherit 
+        from.
+
     Returns:
         class - The augmented Configurable class that may be configured via scooch.
     """
 
-    # TODO [matt.c.mccallum 11.08.21]: Check the class is not already `Configurable`
-    # TODO [matt.c.mccallum 11.08.21]: Inherit class documentation too
+    def configurize_impl(cls, base_cls=None):
 
-    class DerivedConfigurable(cls, Configurable):
-        """
-        """
+        # TODO [matt.c.mccallum 11.08.21]: Check the class is not already `Configurable`
+        # TODO [matt.c.mccallum 11.08.21]: Check that base_cls is `Configurable`
+        # TODO [matt.c.mccallum 11.08.21]: Inherit class documentation too
 
-        __SCOOCH_NAME__ = 'Configurable' + cls.__name__
+        if base_cls is None:
+            base_cls = Configurable
 
-        # TODO [matt.c.mccallum 11.08.21]: Add type info here
-        __PARAMS__ = {param: f'<> - Parameter derived by extending base class: {cls.__name__}' for param in inspect.signature(cls).parameters.keys()}
+        class DerivedConfigurable(cls, base_cls):
+            """
+            """
 
-        __PARAM_DEFAULTS__ = {param: val.default for param, val in inspect.signature(cls).parameters.items() if val.default != val.empty}
+            __SCOOCH_NAME__ = 'Configurable' + cls.__name__
 
-        def __init__(self, cfg):
-            cls.__init__(self, **(cfg[self.__class__.__name__]))
-            Configurable.__init__(self, cfg)
+            # TODO [matt.c.mccallum 11.08.21]: Add type info here
+            __PARAMS__ = {param: f'<> - Parameter derived by extending base class: {cls.__name__}' for param in inspect.signature(cls).parameters.keys()}
 
-    return DerivedConfigurable
+            __PARAM_DEFAULTS__ = {param: val.default for param, val in inspect.signature(cls).parameters.items() if val.default != val.empty}
+
+            def __init__(self, cfg):
+                cls.__init__(self, **(cfg[self.__class__.__name__]))
+                Configurable.__init__(self, cfg)
+
+        return DerivedConfigurable
+
+    if base_class is None and cls is None:
+        return None
+    if base_class is None:
+        return configurize_impl(cls)
+    elif cls is None:
+        return functools.partial(configurize_impl, base_cls=base_class)
+    else:
+        return configurize_impl(cls, base_class)
+
+
