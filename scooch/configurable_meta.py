@@ -17,6 +17,7 @@
 # Python standard library imports
 import textwrap
 import inspect
+from abc import ABCMeta
 
 # Third party imports
 # None.
@@ -27,7 +28,10 @@ from .configurable_param import ConfigurableParam
 from .param import Param
 
 
-class ConfigurableMeta(type):
+# NOTE [matt.c.mccallum 04.07.22]: ABCMeta is perhaps the most commonly used metaclass in python.
+#      We inherit from it in this metaclass to prevent the most common metaclass conflicts with
+#      third party libraries
+class ConfigurableMeta(ABCMeta):
     """
     Metaclass for scooch configurables. Enables programmatic modification
     to the classes for things like programmatic class documentation.
