@@ -170,16 +170,19 @@ class Config(dict):
             parent: dict - The current top level dictionary to recurse through
             and evaluate macros.
         """
-        for child_key, child_var in parent.items():
+        for child_key in list(parent.keys()):
+
+            if child_key == 'PARENT':
+                continue
 
             # Recurse for all children that are dictionaries
-            if type(child_var) is dict and child_key is not 'PARENT':
+            if type(child_var) is dict:
                 parent[child_key]['PARENT'] = parent
                 self._evaluate_vars(parent[child_key])
 
             # If it is a list of values, treat it like each element in the list has the same
             # key and parent.
-            elif type(child_var) is list and child_key is not 'PARENT':
+            elif type(child_var) is list:
                 for idx, sub_var in enumerate(child_var):
                     if type(sub_var) is dict:
                         sub_var['PARENT'] = parent
