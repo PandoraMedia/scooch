@@ -81,6 +81,8 @@ class Configurable(object, metaclass=ConfigurableMeta):
         self._config_instances = {}
         for param_name, configurable in self.__CONFIGURABLES__.items():
             sub_cfg = self._cfg[self.__class__.__name__][param_name]
+            # TODO [matt.c.mccallum 03.01.22]: Add a flag in class definitions that can enable / disable whether a given 
+            #      configurable can be None or not.
             if sub_cfg is not None:
                 obj = self._config_factory.construct(configurable, self._cfg[self.__class__.__name__][param_name])
                 self._config_instances[param_name] = obj
