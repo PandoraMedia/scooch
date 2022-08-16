@@ -22,6 +22,7 @@ import copy
 
 # Local imports
 from . import DEFAULT_NAMESPACE
+from .helper_funcs import class_for_config
 from .configurable_meta import ConfigurableMeta
 from .configurable_factory import ConfigurableFactory
 
@@ -106,12 +107,23 @@ class Configurable(object, metaclass=ConfigurableMeta):
         # If no config was provided for this class, start with an empty dictionary.
         if cfg is None:
             cfg = dict()
+
+        # Populate defaults
         for field, value in defaults.items():
             if field not in cfg.keys():
                 cfg[field] = value
             elif isinstance(value, dict):
                 # Check the sub fields
                 cls._populate_defaults_recurse(cfg[field], value)
+
+        # Populate the defaults of any Configurables that are also encapsulated within this configurable
+        for key, cfg in cfg.items():
+            
+            if key in cls.__CONFIGURABLES__:
+                base_class = cls.__CONFIGURABLES__[key]
+                if issubclass(base_class, Configurable):
+                    subcls = class_for_config(base_class, cfg)
+                    subcls.PopulateDefaults(cfg)
 
     def _verify_config(self, cfg, template):
         """
