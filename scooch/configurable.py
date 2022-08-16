@@ -80,8 +80,12 @@ class Configurable(object, metaclass=ConfigurableMeta):
         self._config_factory = ConfigurableFactory()
         self._config_instances = {}
         for param_name, configurable in self.__CONFIGURABLES__.items():
-            obj = self._config_factory.construct(configurable, self._cfg[self.__class__.__name__][param_name])
-            self._config_instances[param_name] = obj
+            sub_cfg = self._cfg[self.__class__.__name__][param_name]
+            if sub_cfg is not None:
+                obj = self._config_factory.construct(configurable, self._cfg[self.__class__.__name__][param_name])
+                self._config_instances[param_name] = obj
+            else:
+                self._config_instances[param_name] = None
 
     @classmethod
     def populate_defaults(cls, cfg):
@@ -120,7 +124,8 @@ class Configurable(object, metaclass=ConfigurableMeta):
         # Populate the defaults of any Configurables that are also encapsulated within this configurable
         for key, cfg in cfg.items():
             
-            if key in cls.__CONFIGURABLES__:
+            # NOTE [matt.c.mccallum 02.23.22]: Do not populate defaults if there is no class specified (e.g., cfg==None)
+            if key in cls.__CONFIGURABLES__ and cfg is not None:
                 base_class = cls.__CONFIGURABLES__[key]
                 if inspect.isclass(base_class) and issubclass(base_class, Configurable):
                     subcls = class_for_config(base_class, cfg)
