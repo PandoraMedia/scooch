@@ -16,6 +16,7 @@
 
 # Python standard library imports
 import copy
+import inspect
 
 # Third party module imports
 # None
@@ -121,7 +122,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
             
             if key in cls.__CONFIGURABLES__:
                 base_class = cls.__CONFIGURABLES__[key]
-                if issubclass(base_class, Configurable):
+                if inspect.isclass(base_class) and issubclass(base_class, Configurable):
                     subcls = class_for_config(base_class, cfg)
                     subcls.PopulateDefaults(cfg)
 
