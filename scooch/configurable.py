@@ -49,9 +49,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
 
     __CONFIGURABLES__ = {} # <= Parameters that are Scooch configurables and will be constructed according to the configuration dicts specified in the Config
 
-    __PARAM_DEFAULTS__ = {
-        "config_namespace": DEFAULT_NAMESPACE
-    } # <= Parameters that are optional, and if not provided, will assume default values
+    __PARAM_DEFAULTS__ = {} # <= Parameters that are optional, and if not provided, will assume default values
 
     def __init__(self, cfg):
         """
