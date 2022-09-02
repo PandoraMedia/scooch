@@ -45,7 +45,7 @@ class Config(dict):
     # TODO [matt.c.mccallum 07.03.19]: Allow loading a whole folder of configs
     # TODO [matt.c.mccallum 07.03.19]: Allow linking or references between configs to avoid duplication
 
-    def __init__(self, config_file):
+    def __init__(self, config_file, custom_params=dict()):
         """
         **Constructor.**
 
@@ -53,6 +53,7 @@ class Config(dict):
             config_file: str, dict, file or Config - A file like object or filename describing a yaml file to load
             this class's configuration from. Alternatively, it can be a dictionary describing the 
         """
+        # Load the file from disk if necessary
         if type(config_file) is str:
             with open(config_file) as f:
                 self.update(yaml.safe_load(f))
@@ -61,7 +62,10 @@ class Config(dict):
         else:
             self.update(yaml.safe_load(config_file))
 
-        # Store any variables
+        # First modify the config with any custom parameters
+        self.override(custom_params)
+
+        # Store any variables and evaluate macros
         if isinstance(config_file, Config):
             self._vars = config_file._vars
         else:
@@ -75,6 +79,37 @@ class Config(dict):
         }
 
         self._evaluate_vars(self)
+
+    def override(self, custom_params):
+        """
+        Add in any custom parameters that were supplied ad-hoc, i.e., not in the dictionary or yaml file that
+        this object is primarily constructed with.
+
+        Args:
+            custom_params: <dict> - A dictionary mapping parameter paths to values, to override any parameters
+            already in the configuration. Anything specified in the provided override dictionary will overwrite
+            anything in this current config. Anything not specified in the override dictionary will remain as is.
+        """
+        # NOTE [matt.c.mccallum 08.25.22]: This does not do any type checking of the custom configurable params.
+        #      It will blindly add custom parameters to the configuration dictionary. If they are incorrect for the
+        #      object hierarchy, they will be caught when a Configurable is instantiated.
+        for param_name, param_value in custom_params.items():
+            param_path = param_name.split('.')
+            cfg_dict = self
+            for param_field in param_path[:-1]:
+                try:
+                    # If parameter name is numeric, assume it is an index in a ConfigList parameter.
+                    if param_field.isnumeric():
+                        try:
+                            cfg_dict = cfg_dict[int(param_field)]
+                        except IndexError:
+                            raise IndexError(f"Attempted to override SCOOCH Config for item in ConfigList at index {param_field}, which does not exist")
+                    cfg_dict = cfg_dict[param_field]
+                except KeyError:
+                    # If the key does not exist, then create it. Any incorrect configuration is caught at the instantiation of the Configurable.
+                    cfg_dict[param_field] = {}
+                    cfg_dict = cfg_dict[param_field]
+            cfg_dict[param_path[-1]] = param_value
 
     @classmethod
     def _inherit(cls, heirarchy, term, value):

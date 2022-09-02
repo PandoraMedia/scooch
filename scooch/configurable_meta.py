@@ -70,6 +70,11 @@ class ConfigurableMeta(ABCMeta):
                 # Add to __CONFIGURABLES__
                 attrs['__CONFIGURABLES__'][attr_name.lstrip('_')] = value.type
 
+        # Check that no params have numeric names - this can happen with private variables, e.g., '_0' is a valid variable name in python.
+        for attr_name in attrs['__PARAMS__']:
+            if attr_name.isnumeric():
+                raise ValueError(f"The Configurable class, {cls.__name__}, has a numeric parameter named {attr_name}, which is disallowed")
+
         # Create Param / ConfigurableParam attributes that don't already exist from the scooch Configurable dictionaries
         for attr_name in attrs['__PARAMS__']:
             if '_'+attr_name not in attrs and attr_name not in attrs:
