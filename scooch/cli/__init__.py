@@ -15,5 +15,4 @@
 
 
 from .cli import main
-from .options import param
 from .export import *
