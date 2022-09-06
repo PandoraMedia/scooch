@@ -22,8 +22,6 @@ import inspect
 # None
 
 # Local imports
-from . import DEFAULT_NAMESPACE
-from .helper_funcs import class_for_config
 from .configurable_meta import ConfigurableMeta
 from .configurable_factory import ConfigurableFactory
 
@@ -43,9 +41,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
 
     __SCOOCH_NAME__ = None
     
-    __PARAMS__ = {
-        "config_namespace": "<str> - A namespace for the configuration, configs in distinct namespaces will have distinct identities."
-    } # <= Parameters that can be specified in the class's configuration
+    __PARAMS__ = {} # <= Parameters that can be specified in the class's configuration
 
     __CONFIGURABLES__ = {} # <= Parameters that are Scooch configurables and will be constructed according to the configuration dicts specified in the Config
 
@@ -109,6 +105,8 @@ class Configurable(object, metaclass=ConfigurableMeta):
 
             defaults: dict() - A set of defaults to configure in `cfg` if they do not already exist there.
         """
+        configurable_factory = ConfigurableFactory()
+
         # If no config was provided for this class, start with an empty dictionary.
         if cfg is None:
             cfg = dict()
@@ -128,7 +126,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
             if key in cls.__CONFIGURABLES__ and cfg is not None:
                 base_class = cls.__CONFIGURABLES__[key]
                 if inspect.isclass(base_class) and issubclass(base_class, Configurable):
-                    subcls = class_for_config(base_class, cfg)
+                    subcls = configurable_factory.get_class(base_class, cfg)
                     subcls.PopulateDefaults(cfg)
 
     def _verify_config(self, cfg, template):

@@ -15,7 +15,8 @@
 
 
 # Python standard library imports
-# None.
+import logging
+import textwrap
 
 # Third party imports
 # None.
@@ -24,7 +25,6 @@
 from .configurable_meta import ConfigurableMeta
 from .config_list import ConfigList
 from .config_collection import ConfigCollection
-from .helper_funcs import class_instance_for_config
 from .config import Config
 
 
@@ -55,8 +55,65 @@ class ConfigurableFactory( object ):
             output_obj = [self.construct(cfg_type.subtype, each_cfg) for each_cfg in cfg]
         elif type(cfg_type) is ConfigurableMeta:
             # TODO [matt.c.mccallum 01.13.21]: Move the below method to a member function once we have updated all other codebases to use the ConfigurableFactory instead.
-            output_obj = class_instance_for_config(cfg_type, Config(cfg))
+            output_obj = self._class_instance_for_config(cfg_type, Config(cfg))
         else:
             raise TypeError(f'{self.__class__.__name__} requested to construct class with Configurable parameter of type {str(type(cfg_type))}. Eligible types include ConfigList, ConfigCollection or a subclass of Configurable')
         return output_obj
         
+    def get_class(self, base_class, config):
+        """
+        Returns the Configurable class for a given config dictionary or Scooch Config object.
+
+        Args:
+            base_class: Configurable - The base class for which you want to search for derived 
+            classes of.
+
+            config: Config - A dictionary with a key specifying a SCOOCH Configurable class name.
+
+        Return:
+            Configurable.__class__ - The class that can be constructed with the provided config 
+            dictionary.
+        """
+
+        # TODO [matt.c.mccallum 09.06.22]: Generalize to config lists and collections
+
+        fclsses = base_class._all_subclasses() + [base_class]
+        feature_class_names = [clsobj.__name__ for clsobj in fclsses]
+
+        # Search for matching configuration
+        config_fields = config.keys()
+        matching_classes = [c_field for c_field in config_fields if c_field in feature_class_names]
+        if not len(matching_classes):
+            logging.getLogger().error(textwrap.dedent(f"""
+                            Provided configuration does not match any, or matches multiple classes in the provided class hierarchy
+                            Candidates were: {str(feature_class_names)}
+                            Config requested: {str(list(config_fields))}
+                            """))
+            raise KeyError("""Scooch configuration does not match any, or matches multiple classes in the provided class hierarchy""")
+
+        # Get all matching classes
+        f_classes = [fclsses[feature_class_names.index(match_cls)] for match_cls in matching_classes]
+
+        # Return one class if there is only one
+        if len(f_classes) == 1:
+            return f_classes[0]
+
+        # Otherwise return the list of classes
+        return f_classes
+
+    def _class_instance_for_config(self, base_class, config):
+        """
+        Retrieve an instance of a class, constructed with the given configuration.
+
+        Args:
+            base_class: Configurable - The base class for which you want to construct a derived class of.
+
+            config: Config - A configuration object specifying the class name (as the first key),
+            and class config variables (as a dict in the first value), that you want to construct the class
+            with. 
+        
+        Return:
+            Configurable - The constructed class instance that is a derived class of the base class and has been
+            configured with the provided config.
+        """
+        return self.get_class(base_class, config)(config)
