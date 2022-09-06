@@ -29,6 +29,9 @@ class ConfigurableParam:
     A scooch parameter that is itself a scooch Configurable object.
     """
 
+    # TODO [matt.c.mccallum 09.02.22]: Merge this with the Param class and use the type
+    #      to discern whether something is a Configurable or not.
+
     def __init__(self, configurable_type, doc=""):
         """
         **Constructor**
