@@ -75,8 +75,11 @@ class ConfigurableFactory( object ):
             dictionary.
         """
 
-        # TODO [matt.c.mccallum 09.06.22]: Generalize to config lists and collections
+        # If looking for the class of a collection or list, unpack these structures to find the type within
+        while isinstance(base_class, ConfigCollection) or isinstance(base_class, ConfigList):
+            base_class = base_class.subtype
 
+        # Get all potential classes
         fclsses = base_class._all_subclasses() + [base_class]
         feature_class_names = [clsobj.__name__ for clsobj in fclsses]
 
