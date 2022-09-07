@@ -210,6 +210,8 @@ class Config(dict):
             if child_key == 'PARENT':
                 continue
 
+            child_var = parent[child_key]
+
             # Recurse for all children that are dictionaries
             if type(child_var) is dict:
                 parent[child_key]['PARENT'] = parent
