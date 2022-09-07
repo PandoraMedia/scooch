@@ -26,9 +26,9 @@ from . import ParamDefaults
 
 class Param:
     """
-    A Param that is not itself a scooch Configurable. For example, ints, floats, strings, or
-    lists and dicts thereof.
-    Params that are scooch Configurable class's should be of type ConfigurableParam.
+    A Param that is an attribute of a Configurable, this can be a simple type, or a Configurable type itself. 
+    For example, simple types include ints, floats, strings, or lists and dicts thereof, and Configurable types
+    are any class that inherits from Configurable.
     """
 
     def __init__(self, param_type, default=ParamDefaults.NO_DEFAULT, doc=""):
@@ -55,7 +55,11 @@ class Param:
 
     @property
     def doc(self):
-        return f"<{str(self._type.__name__)}> - {self._doc}"
+        return self._doc
+
+    @property
+    def type(self):
+        return self._type
 
     def __set_name__(self, owner, name):
         """
@@ -80,4 +84,16 @@ class Param:
             owner: Configurable - The class that this Param is a Param of.
         """
         # TODO [matt.c.mccallum 11.04.21]: Make sure owner is of type Configurable
-        return instance._cfg[owner.__name__][self._name]
+        return instance._config_instances[self._name]
+
+    def __set__(self, instance, value):
+        """
+        Sets the value of a parameter, keeping this separated from the object's config that
+        was provided upon construction.
+
+        Args:
+            instance: Configurable - The instance to change the value of a config item for.
+
+            value: object - The value to change the config item to.
+        """
+        instance._config_instances[self._name] = value

@@ -73,15 +73,19 @@ class Configurable(object, metaclass=ConfigurableMeta):
         # Construct configurables
         self._config_factory = ConfigurableFactory()
         self._config_instances = {}
-        for param_name, configurable in self.__CONFIGURABLES__.items():
-            sub_cfg = self._cfg[self.__class__.__name__][param_name]
-            # TODO [matt.c.mccallum 03.01.22]: Add a flag in class definitions that can enable / disable whether a given 
-            #      configurable can be None or not.
-            if sub_cfg is not None:
-                obj = self._config_factory.construct(configurable, self._cfg[self.__class__.__name__][param_name])
-                self._config_instances[param_name] = obj
+        for param_name in self.__PARAMS__:
+
+            # NOTE [matt.c.mccallum 09.06.22]: By this point defaults should be populated and anything missing in the
+            #      user provided Config should have raised an error, so the below is redundant but a precaution nonetheless.
+            if param_name not in self._cfg:
+                raise ValueError(f"The {self.__class__.__name__} object is missing a parameter '{param_name}' from its configuration. This shouldn't happen, please file a bug report.")
+
+            if param_name in self.__CONFIGURABLES__:
+                obj = self._config_factory.construct(self.__CONFIGURABLES__[param_name], self._cfg[self.__class__.__name__][param_name])
             else:
-                self._config_instances[param_name] = None
+                obj = self._cfg[self.__class__.__name__][param_name]
+
+            self._config_instances[param_name] = obj
 
     @classmethod
     def populate_defaults(cls, cfg):
@@ -127,11 +131,12 @@ class Configurable(object, metaclass=ConfigurableMeta):
                 base_class = cls.__CONFIGURABLES__[key]
                 if inspect.isclass(base_class) and issubclass(base_class, Configurable):
                     subcls = configurable_factory.get_class(base_class, cfg)
-                    subcls.PopulateDefaults(cfg)
+                    subcls.populate_defaults(cfg)
 
     def _verify_config(self, cfg, template):
         """
-        Checks that all the required fields in the object configuration are there.
+        Checks that all the required fields in the object configuration are there,
+        and any fields that aren't in the object configuration, aren't there.
 
         Args:
             cfg: dict() - An object providing the configuration parameters for this object.
@@ -139,16 +144,23 @@ class Configurable(object, metaclass=ConfigurableMeta):
             template: list() - A list of keys that describe the required fields to be configured for this object.
             This may includ dictionaries, allowing a heirarchy in the provided configuration.
         """
-        # TODO [matt.c.mccallum 01.05.21]: ADD TYPE CHECKING HERE - CHECK ALL CONFIGURABLES ARE OF THE RIGHT TYPE,
-        #      AND THOSE THAT ARE LISTS OF CONFIGURABLES SHOULD BE LISTS ALSO.
+        # TODO [matt.c.mccallum 09.06.22]: Collect all errors before raising them, rather than raising an error as
+        #      soon as any config error is found.
+        # TODO [matt.c.mccallum 09.06.22]: Add CLI to verify a config yaml file.
+        # TODO [matt.c.mccallum 01.05.21]: Add type checking here, check all configurables are of the right type,
+        #      and those that are collections or lists of configurables are of the right type also.
         for field in template:
             if isinstance(field, dict):
                 for key in field.keys():
                     if key not in cfg.keys():
-                        raise ValueError("Scooch config error: " + key + " value not found in " + self.__class__.__name__ + " object configuration")
+                        raise ValueError(f"Scooch config error: {key} value not found in Config for {self.__class__.__name__}")
                     self._verify_config(cfg[key], field[key])
             elif field not in cfg.keys():
-                raise ValueError("Scooch config error: " + field + " value not found in " + self.__class__.__name__ + " object configuration")
+                raise ValueError(f"Scooch config error: {field} value not found in Config for {self.__class__.__name__}")
+
+        extraneous_keys = set(cfg.keys()) - set(template.keys())
+        if len(extraneous_keys):
+            raise ValueError(f"Scooch config error: extraneous key(s) found in Config: ({extraneous_keys}). These do not configure any parameter in the Configurable: {self.__class__.__name__}")
 
     @property
     def cfg(self):
