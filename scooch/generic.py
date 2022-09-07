@@ -40,17 +40,16 @@ def merge_lists(list1, override):
     Return:
         list - The merged list of dictionaries.
     """
-    # TODO [matt.c.mccallum 08.31.22]: What about other iterable types that are not lists, e.g., tuples?
-    # TODO [matt.c.mccallum 08.31.22]: What about when the override dict consists of dicts and is the same length as list1? Could we merge each dict together?
+    # TODO [matt.c.mccallum 08.31.22]: Test for other iterable types that are not lists, e.g., tuples?
+    # TODO [matt.c.mccallum 08.31.22]: When the override consists of a list of dicts and is the same length as list1, merge each dict together.
     if isinstance(override, list):
         return override
     elif isinstance(override, dict) and all(isinstance(k, int) for k in override):
         for idx, value in override.items():
             # TODO [matt.c.mccallum 09.01.22]: Delete this line below once cli types are sorted
             if idx >= len(list1):
-                raise ValueError("...")
+                raise ValueError(f"Merging of SCOOCH lists failed. Requested merge at index {idx} but list to merge to is of length {len(list1)}.")
             if isinstance(list1[idx], dict) and isinstance(value, dict):
-                print('merge lists inner')
                 list1[idx] = [dict(merge_dicts(list1[idx], value))]
             elif isinstance(list1[idx], list) and isinstance(value, dict):
                 list1[idx] = [merge_lists(list1[idx], value)]
@@ -66,10 +65,10 @@ def merge_lists(list1, override):
 def merge_dicts(dict1, override):
     """
     Merges two nested dictionaries, resolving conflicts by overwriting anything in the first argument
-    (dict1) with that in the second argument (dict2).
+    (dict1) with that in the second argument (override).
 
     Args:
-        dict1: <dict> - A dictionary to merge with dict2.
+        dict1: <dict> - A dictionary to merge with override.
 
         override: <dict> - A dictionary to merge with dict1, for any key in both dictionaries, the values
         in this dictionary will be selected to override that in dict1.
@@ -78,7 +77,7 @@ def merge_dicts(dict1, override):
         <(key, dict)> - Generates tuples of key / value pairs. This is to be used in a generator, e.g.,
         to retrieve a complete merged dictionary:
         
-            dict(merge_dicts(dict1, dict2))
+            dict(merge_dicts(dict1, override))
     """
     for k in set(dict1.keys()).union(override.keys()):
         if k in dict1 and k in override:
