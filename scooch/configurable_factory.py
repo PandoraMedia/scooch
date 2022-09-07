@@ -76,7 +76,7 @@ class ConfigurableFactory( object ):
         """
 
         # If looking for the class of a collection or list, unpack these structures to find the type within
-        while isinstance(base_class, ConfigCollection) or isinstance(base_class, ConfigList):
+        while isinstance(base_class, (ConfigCollection, ConfigList)):
             base_class = base_class.subtype
 
         # Get all potential classes
@@ -88,11 +88,11 @@ class ConfigurableFactory( object ):
         matching_classes = [c_field for c_field in config_fields if c_field in feature_class_names]
         if not len(matching_classes):
             logging.getLogger().error(textwrap.dedent(f"""
-                            Provided configuration does not match any, or matches multiple classes in the provided class hierarchy
+                            Provided configuration does not match any class in the provided class hierarchy
                             Candidates were: {str(feature_class_names)}
                             Config requested: {str(list(config_fields))}
                             """))
-            raise KeyError("""Scooch configuration does not match any, or matches multiple classes in the provided class hierarchy""")
+            raise KeyError("""Scooch configuration does not match any class in the provided class hierarchy""")
 
         # Get all matching classes
         f_classes = [fclsses[feature_class_names.index(match_cls)] for match_cls in matching_classes]
@@ -100,9 +100,8 @@ class ConfigurableFactory( object ):
         # Return one class if there is only one
         if len(f_classes) == 1:
             return f_classes[0]
-
-        # Otherwise return the list of classes
-        return f_classes
+        else:
+            raise KeyError(f"Attempted to retrieve class of type {base_class.__name__}, which matches multiple possible classes: {[cl.__name__ for cl in matching_classes]}")
 
     def _class_instance_for_config(self, base_class, config):
         """

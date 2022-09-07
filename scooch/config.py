@@ -219,16 +219,16 @@ class Config(dict):
 
             # If it is a list of values, treat it like each element in the list has the same
             # key and parent.
-            elif type(child_var) is list:
+            elif isinstance(child_var, list):
                 for idx, sub_var in enumerate(child_var):
-                    if type(sub_var) is dict:
+                    if isinstance(sub_var, dict):
                         sub_var['PARENT'] = parent
                         self._evaluate_vars(sub_var)
-                    elif type(sub_var) is str:
+                    elif isinstance(sub_var, str):
                         child_var[idx] = self._evaluate_macro(parent, child_key, sub_var)
 
             # If it is a string evaluate functions for all macros
-            elif type(child_var) is str:
+            elif isinstance(child_var, str):
                 parent[child_key] = self._evaluate_macro(parent, child_key, child_var)
 
         # Remove the reverse linkages to parents on the way out
