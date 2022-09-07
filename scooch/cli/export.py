@@ -21,7 +21,6 @@
 # None
 
 # Local imports
-from ..generic import nest_keys
 from ..generic import merge_dicts
 import yaml
 
@@ -58,6 +57,8 @@ def parse_custom_params(custom_params_list):
     Return:
         <dict> - A dictionary containing only the specified custom parameters.
     """
+    # TODO [matt.c.mccallum 09.01.22]: Check this works when just one parameter is passed in via the CLI.
+
     custom_param_dicts = [_parse_param(param) for param in custom_params_list]
 
     print(custom_param_dicts)
