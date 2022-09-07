@@ -25,6 +25,8 @@ from abc import ABCMeta
 # Local imports
 from . import ParamDefaults
 from .param import Param
+from .config_list import ConfigList
+from .config_collection import ConfigCollection
 
 
 # NOTE [matt.c.mccallum 04.07.22]: ABCMeta is perhaps the most commonly used metaclass in python.
@@ -64,7 +66,7 @@ class ConfigurableMeta(ABCMeta):
                 if value.default != ParamDefaults.NO_DEFAULT:
                     attrs['__PARAM_DEFAULTS__'][attr_name.lstrip('_')] = value.default
 
-                if isinstance(value.type, ConfigurableMeta):
+                if isinstance(value.type, (ConfigurableMeta, ConfigList, ConfigCollection)):
                     # Add to __CONFIGURABLES__
                     attrs['__CONFIGURABLES__'][attr_name.lstrip('_')] = value.type
 
