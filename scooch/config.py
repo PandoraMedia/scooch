@@ -213,7 +213,7 @@ class Config(dict):
             child_var = parent[child_key]
 
             # Recurse for all children that are dictionaries
-            if type(child_var) is dict:
+            if isinstance(child_var, dict):
                 parent[child_key]['PARENT'] = parent
                 self._evaluate_vars(parent[child_key])
 
