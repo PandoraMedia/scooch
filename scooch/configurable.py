@@ -142,23 +142,18 @@ class Configurable(object, metaclass=ConfigurableMeta):
             cfg: dict() - An object providing the configuration parameters for this object.
 
             template: list() - A list of keys that describe the required fields to be configured for this object.
-            This may includ dictionaries, allowing a heirarchy in the provided configuration.
+            This may include dictionaries, allowing a heirarchy in the provided configuration.
         """
         # TODO [matt.c.mccallum 09.06.22]: Collect all errors before raising them, rather than raising an error as
         #      soon as any config error is found.
         # TODO [matt.c.mccallum 09.06.22]: Add CLI to verify a config yaml file.
         # TODO [matt.c.mccallum 01.05.21]: Add type checking here, check all configurables are of the right type,
         #      and those that are collections or lists of configurables are of the right type also.
-        for field in template:
-            if isinstance(field, dict):
-                for key in field.keys():
-                    if key not in cfg.keys():
-                        raise ValueError(f"Scooch config error: {key} value not found in Config for {self.__class__.__name__}")
-                    self._verify_config(cfg[key], field[key])
-            elif field not in cfg.keys():
-                raise ValueError(f"Scooch config error: {field} value not found in Config for {self.__class__.__name__}")
+        missing_keys = set(template) - set(cfg.keys())
+        if len(missing_keys):
+            raise ValueError(f"Scooch config error: The required keys, {missing_keys}, were not found in Config for {self.__class__.__name__}")
 
-        extraneous_keys = set(cfg.keys()) - set(template.keys())
+        extraneous_keys = set(cfg.keys()) - set(template)
         if len(extraneous_keys):
             raise ValueError(f"Scooch config error: extraneous key(s) found in Config: ({extraneous_keys}). These do not configure any parameter in the Configurable: {self.__class__.__name__}")
 
