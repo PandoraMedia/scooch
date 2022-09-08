@@ -80,7 +80,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
             if param_name not in self._cfg[self.__class__.__name__]:
                 raise ValueError(f"The {self.__class__.__name__} config is missing a parameter '{param_name}' from its configuration. This was not caught in config validation, please file a bug report. The provided config was: {self._cfg}")
 
-            if param_name in self.__CONFIGURABLES__:
+            if param_name in self.__CONFIGURABLES__ and self._cfg[self.__class__.__name__][param_name] is not None:
                 obj = self._config_factory.construct(self.__CONFIGURABLES__[param_name], self._cfg[self.__class__.__name__][param_name])
             else:
                 obj = self._cfg[self.__class__.__name__][param_name]
