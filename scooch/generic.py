@@ -40,13 +40,12 @@ def merge_lists(list1, override):
     Return:
         list - The merged list of dictionaries.
     """
-    # TODO [matt.c.mccallum 08.31.22]: Test for other iterable types that are not lists, e.g., tuples?
+    # TODO [matt.c.mccallum 08.31.22]: Test for other iterable types that are not lists, e.g., tuples.
     # TODO [matt.c.mccallum 08.31.22]: When the override consists of a list of dicts and is the same length as list1, merge each dict together.
     if isinstance(override, list):
         return override
     elif isinstance(override, dict) and all(isinstance(k, int) for k in override):
         for idx, value in override.items():
-            # TODO [matt.c.mccallum 09.01.22]: Delete this line below once cli types are sorted
             if idx >= len(list1):
                 raise ValueError(f"Merging of SCOOCH lists failed. Requested merge at index {idx} but list to merge to is of length {len(list1)}.")
             if isinstance(list1[idx], dict) and isinstance(value, dict):
