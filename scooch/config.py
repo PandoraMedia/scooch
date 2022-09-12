@@ -205,7 +205,8 @@ class Config(dict):
             parent: dict - The current top level dictionary to recurse through
             and evaluate macros.
         """
-        for child_key in list(parent.keys()):
+        initial_keys = list(parent.keys())
+        for child_key in initial_keys:
 
             if child_key == 'PARENT':
                 continue
