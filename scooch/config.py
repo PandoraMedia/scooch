@@ -15,7 +15,6 @@
 
 
 # Python standard library imports
-import os
 import json
 import hashlib
 import re
@@ -23,6 +22,7 @@ from datetime import datetime
 
 # Third party module imports
 import yaml
+from .generic import merge_dicts
 
 # Local imports
 # None.
@@ -93,23 +93,7 @@ class Config(dict):
         # NOTE [matt.c.mccallum 08.25.22]: This does not do any type checking of the custom configurable params.
         #      It will blindly add custom parameters to the configuration dictionary. If they are incorrect for the
         #      object hierarchy, they will be caught when a Configurable is instantiated.
-        for param_name, param_value in custom_params.items():
-            param_path = param_name.split('.')
-            cfg_dict = self
-            for param_field in param_path[:-1]:
-                try:
-                    # If parameter name is numeric, assume it is an index in a ConfigList parameter.
-                    if param_field.isnumeric():
-                        try:
-                            cfg_dict = cfg_dict[int(param_field)]
-                        except IndexError:
-                            raise IndexError(f"Attempted to override SCOOCH Config for item in ConfigList at index {param_field}, which does not exist")
-                    cfg_dict = cfg_dict[param_field]
-                except KeyError:
-                    # If the key does not exist, then create it. Any incorrect configuration is caught at the instantiation of the Configurable.
-                    cfg_dict[param_field] = {}
-                    cfg_dict = cfg_dict[param_field]
-            cfg_dict[param_path[-1]] = param_value
+        self.update(dict(merge_dicts(self, custom_params)))
 
     @classmethod
     def _inherit(cls, heirarchy, term, value):
