@@ -65,7 +65,6 @@ def parse_custom_params(custom_params_list):
     # TODO [matt.c.mccallum 09.07.22]: Check for duplicate paths
 
     seed_dict = {}
-    while len(custom_param_dicts):
-        seed_dict = dict(merge_dicts(seed_dict, custom_param_dicts[0]))
-        del custom_param_dicts[0]
+    for param_dict in custom_param_dicts:
+        seed_dict = dict(merge_dicts(seed_dict, param_dict))
     return seed_dict
