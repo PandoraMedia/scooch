@@ -25,6 +25,9 @@ from ..generic import merge_dicts
 import yaml
 
 
+__all__ = ['parse_custom_params']
+
+
 def _parse_param(param):
     """
     Parses a command line parameter into a single element parameter dictionary.
