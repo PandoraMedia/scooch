@@ -47,7 +47,7 @@ def merge_lists(list1, override):
     elif isinstance(override, dict) and all(isinstance(k, int) for k in override):
         for idx, value in override.items():
             if idx >= len(list1):
-                raise ValueError(f"Merging of SCOOCH lists failed. Requested merge at index {idx} but list to merge to is of length {len(list1)}.")
+                raise ValueError(f"Merging of SCOOCH lists failed. Requested merge at index {idx} but the list to merge into is of length {len(list1)}.")
             if isinstance(list1[idx], dict) and isinstance(value, dict):
                 list1[idx] = dict(merge_dicts(list1[idx], value))
             elif isinstance(list1[idx], list) and isinstance(value, dict):
