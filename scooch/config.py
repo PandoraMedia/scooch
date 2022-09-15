@@ -45,6 +45,8 @@ class Config(dict):
     # TODO [matt.c.mccallum 07.03.19]: Allow loading a whole folder of configs
     # TODO [matt.c.mccallum 07.03.19]: Allow linking or references between configs to avoid duplication
 
+    _CONSTANTS_KEY = 'Constants'
+
     def __init__(self, config_file, custom_params=dict()):
         """
         **Constructor.**
@@ -62,25 +64,34 @@ class Config(dict):
         else:
             self.update(yaml.safe_load(config_file))
 
-        # First modify the config with any custom parameters
-        self.override(custom_params)
-
         # Store any variables and evaluate macros
         if isinstance(config_file, Config):
             self._vars = config_file._vars
         else:
-            self._vars = self.get('Constants', [])
+            self._vars = self.get(self._CONSTANTS_KEY, [])
             if len(self._vars):
-                del self['Constants']
+                del self[self._CONSTANTS_KEY]
 
         self._VAR_FUNCS = {
             'inherit': Config._inherit,
             'datetime': Config._datetime
         }
 
+        # Merge in any custom constants
+        self.override(self._vars, custom_params.get(self._CONSTANTS_KEY, {}))
+        if self._CONSTANTS_KEY in custom_params: del custom_params[self._CONSTANTS_KEY]
+
+        # Evaluate vars first
         self._evaluate_vars(self)
 
-    def override(self, custom_params):
+        # Then modify the config with any custom parameters
+        self.override(self, custom_params)
+
+        # Then evaluate vars again in case the override included macros
+        self._evaluate_vars(self)
+
+    @staticmethod
+    def override(config_dict, custom_params):
         """
         Add in any custom parameters that were supplied ad-hoc, i.e., not in the dictionary or yaml file that
         this object is primarily constructed with.
@@ -93,7 +104,7 @@ class Config(dict):
         # NOTE [matt.c.mccallum 08.25.22]: This does not do any type checking of the custom configurable params.
         #      It will blindly add custom parameters to the configuration dictionary. If they are incorrect for the
         #      object hierarchy, they will be caught when a Configurable is instantiated.
-        self.update(dict(merge_dicts(self, custom_params)))
+        config_dict.update(dict(merge_dicts(config_dict, custom_params)))
 
     @classmethod
     def _inherit(cls, heirarchy, term, value):
