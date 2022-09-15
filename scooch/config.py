@@ -68,7 +68,7 @@ class Config(dict):
         if isinstance(config_file, Config):
             self._vars = config_file._vars
         else:
-            self._vars = self.get(self._CONSTANTS_KEY, [])
+            self._vars = self.get(self._CONSTANTS_KEY, {})
             if len(self._vars):
                 del self[self._CONSTANTS_KEY]
 
