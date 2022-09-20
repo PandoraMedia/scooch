@@ -26,9 +26,7 @@ from .config_list import *
 from .config_collection import *
 from .config_factory import *
 from .param import Param
-from .configurable_param import ConfigurableParam
+from .configurable_factory import ConfigurableFactory
 
 # TODO [matt.c.mccallum 01.05.21]: Remove the two below in favor of the config factory, once legacy codebases are updated.
 from .configurize_helper import configurize
-from .helper_funcs import class_for_config
-from .helper_funcs import class_instance_for_config

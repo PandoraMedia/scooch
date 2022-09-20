@@ -15,7 +15,6 @@
 
 
 # Python standard library imports
-import os
 import json
 import hashlib
 import re
@@ -23,6 +22,7 @@ from datetime import datetime
 
 # Third party module imports
 import yaml
+from .generic import merge_dicts
 
 # Local imports
 # None.
@@ -45,7 +45,9 @@ class Config(dict):
     # TODO [matt.c.mccallum 07.03.19]: Allow loading a whole folder of configs
     # TODO [matt.c.mccallum 07.03.19]: Allow linking or references between configs to avoid duplication
 
-    def __init__(self, config_file):
+    _CONSTANTS_KEY = 'Constants'
+
+    def __init__(self, config_file, custom_params=dict()):
         """
         **Constructor.**
 
@@ -53,6 +55,7 @@ class Config(dict):
             config_file: str, dict, file or Config - A file like object or filename describing a yaml file to load
             this class's configuration from. Alternatively, it can be a dictionary describing the 
         """
+        # Load the file from disk if necessary
         if type(config_file) is str:
             with open(config_file) as f:
                 self.update(yaml.safe_load(f))
@@ -61,20 +64,47 @@ class Config(dict):
         else:
             self.update(yaml.safe_load(config_file))
 
-        # Store any variables
+        # Store any variables and evaluate macros
         if isinstance(config_file, Config):
             self._vars = config_file._vars
         else:
-            self._vars = self.get('Constants', [])
+            self._vars = self.get(self._CONSTANTS_KEY, {})
             if len(self._vars):
-                del self['Constants']
+                del self[self._CONSTANTS_KEY]
 
         self._VAR_FUNCS = {
             'inherit': Config._inherit,
             'datetime': Config._datetime
         }
 
+        # Merge in any custom constants
+        self.override(self._vars, custom_params.get(self._CONSTANTS_KEY, {}))
+        if self._CONSTANTS_KEY in custom_params: del custom_params[self._CONSTANTS_KEY]
+
+        # Evaluate vars first
         self._evaluate_vars(self)
+
+        # Then modify the config with any custom parameters
+        self.override(self, custom_params)
+
+        # Then evaluate vars again in case the override included macros
+        self._evaluate_vars(self)
+
+    @staticmethod
+    def override(config_dict, custom_params):
+        """
+        Add in any custom parameters that were supplied ad-hoc, i.e., not in the dictionary or yaml file that
+        this object is primarily constructed with.
+
+        Args:
+            custom_params: <dict> - A dictionary mapping parameter paths to values, to override any parameters
+            already in the configuration. Anything specified in the provided override dictionary will overwrite
+            anything in this current config. Anything not specified in the override dictionary will remain as is.
+        """
+        # NOTE [matt.c.mccallum 08.25.22]: This does not do any type checking of the custom configurable params.
+        #      It will blindly add custom parameters to the configuration dictionary. If they are incorrect for the
+        #      object hierarchy, they will be caught when a Configurable is instantiated.
+        config_dict.update(dict(merge_dicts(config_dict, custom_params)))
 
     @classmethod
     def _inherit(cls, heirarchy, term, value):
@@ -170,25 +200,31 @@ class Config(dict):
             parent: dict - The current top level dictionary to recurse through
             and evaluate macros.
         """
-        for child_key, child_var in parent.items():
+        initial_keys = list(parent.keys())
+        for child_key in initial_keys:
+
+            if child_key == 'PARENT':
+                continue
+
+            child_var = parent[child_key]
 
             # Recurse for all children that are dictionaries
-            if type(child_var) is dict and child_key is not 'PARENT':
+            if isinstance(child_var, dict):
                 parent[child_key]['PARENT'] = parent
                 self._evaluate_vars(parent[child_key])
 
             # If it is a list of values, treat it like each element in the list has the same
             # key and parent.
-            elif type(child_var) is list and child_key is not 'PARENT':
+            elif isinstance(child_var, list):
                 for idx, sub_var in enumerate(child_var):
-                    if type(sub_var) is dict:
+                    if isinstance(sub_var, dict):
                         sub_var['PARENT'] = parent
                         self._evaluate_vars(sub_var)
-                    elif type(sub_var) is str:
+                    elif isinstance(sub_var, str):
                         child_var[idx] = self._evaluate_macro(parent, child_key, sub_var)
 
             # If it is a string evaluate functions for all macros
-            elif type(child_var) is str:
+            elif isinstance(child_var, str):
                 parent[child_key] = self._evaluate_macro(parent, child_key, child_var)
 
         # Remove the reverse linkages to parents on the way out

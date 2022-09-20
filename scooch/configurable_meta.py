@@ -17,17 +17,22 @@
 # Python standard library imports
 import textwrap
 import inspect
+from abc import ABCMeta
 
 # Third party imports
 # None.
 
 # Local imports
 from . import ParamDefaults
-from .configurable_param import ConfigurableParam
 from .param import Param
+from .config_list import ConfigList
+from .config_collection import ConfigCollection
 
 
-class ConfigurableMeta(type):
+# NOTE [matt.c.mccallum 04.07.22]: ABCMeta is perhaps the most commonly used metaclass in python.
+#      We inherit from it in this metaclass to prevent the most common metaclass conflicts with
+#      third party libraries
+class ConfigurableMeta(ABCMeta):
     """
     Metaclass for scooch configurables. Enables programmatic modification
     to the classes for things like programmatic class documentation.
@@ -54,25 +59,37 @@ class ConfigurableMeta(type):
         for attr_name, value in attrs.items():
 
             if isinstance(value, Param):
+
                 # Populate __PARAMS__
                 attrs['__PARAMS__'][attr_name.lstrip('_')] = value.doc
                 # Populate __PARAM_DEFAULTS__
                 if value.default != ParamDefaults.NO_DEFAULT:
                     attrs['__PARAM_DEFAULTS__'][attr_name.lstrip('_')] = value.default
 
-            if isinstance(value, ConfigurableParam):
-                # Populate __PARAMS__
-                attrs['__PARAMS__'][attr_name.lstrip('_')] = value.doc
-                # Add to __CONFIGURABLES__
-                attrs['__CONFIGURABLES__'][attr_name.lstrip('_')] = value.type
+                if isinstance(value.type, (ConfigurableMeta, ConfigList, ConfigCollection)):
+                    # Add to __CONFIGURABLES__
+                    attrs['__CONFIGURABLES__'][attr_name.lstrip('_')] = value.type
+
+        # Check that no params have numeric names - this can happen with private variables, e.g., '_0' is a valid variable name in python.
+        for attr_name in attrs['__PARAMS__']:
+            if attr_name.isnumeric():
+                raise ValueError(f"The Configurable class, {cls.__name__}, has a numeric parameter named {attr_name}, which is disallowed")
 
         # Create Param / ConfigurableParam attributes that don't already exist from the scooch Configurable dictionaries
         for attr_name in attrs['__PARAMS__']:
             if '_'+attr_name not in attrs and attr_name not in attrs:
                 if attr_name in attrs['__CONFIGURABLES__']:
-                    attrs['_'+attr_name] = ConfigurableParam(attrs['__CONFIGURABLES__'][attr_name], attrs['__PARAMS__'][attr_name])
+                    attrs['_'+attr_name] = Param(
+                        attrs['__CONFIGURABLES__'][attr_name], 
+                        attrs['__PARAM_DEFAULTS__'].get(attr_name, ParamDefaults.NO_DEFAULT), 
+                        attrs['__PARAMS__'][attr_name]
+                    )
                 else:
-                    attrs['_'+attr_name] = Param(None, attrs['__PARAM_DEFAULTS__'].get(attr_name, None), attrs['__PARAMS__'][attr_name])
+                    attrs['_'+attr_name] = Param(
+                        None, # NOTE [matt.c.mccallum 09.06.22]: Currently no way to infer type from the older __PARAM__ class dictionaries. We may address this in the future.
+                        attrs['__PARAM_DEFAULTS__'].get(attr_name, ParamDefaults.NO_DEFAULT), 
+                        attrs['__PARAMS__'][attr_name]
+                    )
 
         # Update the docs
         if not '__doc__' in attrs:

@@ -25,7 +25,7 @@ import ruamel.yaml
 # Local imports
 from . import options
 import json
-from scooch import Configurable, config_factory
+from scooch import Configurable
 from scooch import ConfigFactory
 
 
