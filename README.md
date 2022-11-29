@@ -83,7 +83,6 @@ Each class in this configuration corresponds directly to a scooch `Configurable`
 ```
 from scooch import Configurable
 from scooch import Param
-from scooch import ConfigurableParam
 from scooch import ConfigList
 
 class SpectrogramFeature(Configurable):
@@ -115,13 +114,13 @@ class TranslationAugmenter(Augmenter):
 class Batcher(Configurable):
     
     _batch_size = Param(int, default=256, doc="Number of samples per batch")
-    _feature = ConfigurableParam(SpectrogramFeature, doc="The feature to produce samples of")
-    _augmenters = ConfigurableParam(ConfigList(Augmenter), doc="A list of data augmenters to sample from")
+    _feature = Param(SpectrogramFeature, doc="The feature to produce samples of")
+    _augmenters = Param(ConfigList(Augmenter), doc="A list of data augmenters to sample from")
     
     ...
 ```
 
-In the above snippet, we can see abstraction, polymorphism, inheritance, and encapsulation employed within the classes, and their scooch parameters. Once configured, within each of the classes above the `Param`s and `ConfigurableParam`s will become accessible as attributes of the encapsulating `Configurable` class instance. Furthermore the scooch `Param` / `ConfigurableParam` documentation will be added to the `Configurable` class's doc string for accessibilty in any auto-generated documentation.
+In the above snippet, we can see abstraction, polymorphism, inheritance, and encapsulation employed within the classes, and their scooch parameters. Once configured, within each of the classes above the `Param`s and will become accessible as attributes of the encapsulating `Configurable` class instance. Furthermore the scooch `Param` documentation will be added to the `Configurable` class's doc string for accessibilty in any auto-generated documentation.
 
 With the class definitions and the `config.yaml` file provided above, configuring the Batcher class and running the code in a script could be as simple as:
 

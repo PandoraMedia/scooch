@@ -60,7 +60,6 @@ pymodule = partial_option(
         multiple=True,
 )
 
-# TODO [matt.c.mccallum 08.15.22]: Ensure this will default to the right types for populating params
 param = partial_option(
         "--param",
         help="Custom parameter override option to replace values in a config.yml file.",
