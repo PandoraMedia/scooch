@@ -75,7 +75,7 @@ class ConfigurableMeta(ABCMeta):
             if attr_name.isnumeric():
                 raise ValueError(f"The Configurable class, {cls.__name__}, has a numeric parameter named {attr_name}, which is disallowed")
 
-        # Create Param / ConfigurableParam attributes that don't already exist from the scooch Configurable dictionaries
+        # Create Param attributes that don't already exist from the scooch Configurable dictionaries
         for attr_name in attrs['__PARAMS__']:
             if '_'+attr_name not in attrs and attr_name not in attrs:
                 if attr_name in attrs['__CONFIGURABLES__']:

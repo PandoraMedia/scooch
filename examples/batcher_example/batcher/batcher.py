@@ -16,7 +16,6 @@
 import random
 import numpy as np
 from scooch import Configurable
-from scooch import ConfigurableParam
 from scooch import Param
 from .augmenters import Augmenter
 
@@ -27,7 +26,7 @@ class Batcher(Configurable):
 
     _batch_size = Param(int, default=128, doc="The number of samples in each mini-batch")
     _audio_samples_per_smaple = Param(int, default=1024, doc="The number of audio samples to extract each feature from")
-    _augmenter = ConfigurableParam(Augmenter, doc="An augmentation transformation to be applied to each sample")
+    _augmenter = Param(Augmenter, doc="An augmentation transformation to be applied to each sample")
 
     def set_data(self, data):
         # Save a reference to a data array, to sample / batch from

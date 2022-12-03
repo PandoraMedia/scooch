@@ -35,11 +35,11 @@ sys.path.insert(0, os.path.abspath('..'))
 # -- Project information -----------------------------------------------------
 
 project = 'Scooch'
-copyright = '2021 Pandora Media, LLC.'
+copyright = '2023 Pandora Media, LLC.'
 author = 'Matt C. McCallum'
 
 # The full version, including alpha/beta/rc tags
-release = '0.0.9'
+release = '1.0.1'
 
 
 # -- General configuration ---------------------------------------------------

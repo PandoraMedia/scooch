@@ -11,7 +11,6 @@ Docs for scooch functions and classes are found here.
    configurable
    config
    param
-   configurable_param
    config_list
    config_collection
    configurable_factory

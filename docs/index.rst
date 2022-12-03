@@ -77,7 +77,6 @@ Each class in this configuration corresponds directly to a Scooch :code:`Configu
 
     from scooch import Configurable
     from scooch import Param
-    from scooch import ConfigurableParam
     from scooch import ConfigList
 
     class SpectrogramFeature(Configurable):
@@ -109,12 +108,12 @@ Each class in this configuration corresponds directly to a Scooch :code:`Configu
     class Batcher(Configurable):
         
         _batch_size = Param(int, default=256, doc="Number of samples per batch")
-        _feature = ConfigurableParam(SpectrogramFeature, doc="The feature to produce samples of")
-        _augmenters = ConfigurableParam(ConfigList(Augmenter), doc="A list of data augmenters to sample from")
+        _feature = Param(SpectrogramFeature, doc="The feature to produce samples of")
+        _augmenters = Param(ConfigList(Augmenter), doc="A list of data augmenters to sample from")
         
         ...
 
-In the above snippet, we can see abstraction, polymorphism, inheritance, and encapsulation employed within the classes, and their Scooch parameters. Once configured, within each of the classes above the :code:`Param`\ s and :code:`ConfigurableParam`\ s will become accessible as attributes of the encapsulating :code:`Configurable` class instance. Furthermore, the Scooch :code:`Param` / :code:`ConfigurableParam` documentation will be added to the :code:`Configurable` class's doc string for accessibilty in any auto-generated documentation.
+In the above snippet, we can see abstraction, polymorphism, inheritance, and encapsulation employed within the classes, and their Scooch parameters. Once configured, within each of the classes above the :code:`Param`\ s will become accessible as attributes of the encapsulating :code:`Configurable` class instance. Furthermore, the Scooch :code:`Param` documentation will be added to the :code:`Configurable` class's doc string for accessibilty in any auto-generated documentation.
 
 With the class definitions and the :code:`config.yaml` file provided above, configuring the :code:`Batcher` class and running the code in a script could be as simple as:
 
@@ -134,6 +133,12 @@ With the class definitions and the :code:`config.yaml` file provided above, conf
 
     # Use the class to produce a batch with the configured parameters
     samples = a_batcher.get_batch()
+
+As your codebases grow having a tool to explore the available functionality of that codebase will become more important. Fortunately, if your codebase is SCOOCH configurable, the SCOOCH CLI can help. For example to view the details of all of the :code:`Augmenter` types in the `batcher` module described above, you can simply type the following on the command line:
+
+.. code-block:: bash
+
+    scooch options -m batcher -f Augmenter
 
 Index
 ==================

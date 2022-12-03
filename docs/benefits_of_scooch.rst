@@ -57,7 +57,6 @@ Often in ML pipelines you will want to reuse functionality (and hence configurat
     from features import FeatureTransform
     from batcher import Batcher
     from scooch import Configurable
-    from scooch import ConfigurableParam
 
     class Task(Configurable):
         """
@@ -70,8 +69,8 @@ Often in ML pipelines you will want to reuse functionality (and hence configurat
         Batches data.
         """
 
-        _feature = ConfigurableParam(FeatureTransform, doc="Transforms features for neural net input")
-        _batcher = ConfigurableParam(Batcher, doc="Batches feature Data")
+        _feature = Param(FeatureTransform, doc="Transforms features for neural net input")
+        _batcher = Param(Batcher, doc="Batches feature Data")
         ...
 
     class InferenceTask(Task):
@@ -79,8 +78,8 @@ Often in ML pipelines you will want to reuse functionality (and hence configurat
         Applies inference.
         """
 
-        _feature = ConfigurableParam(FeatureTransform, doc="Transforms features for neural net input")
-        _model = ConfigurableParam(Model, doc="A trained model for analyzing features")
+        _feature = Param(FeatureTransform, doc="Transforms features for neural net input")
+        _model = Param(Model, doc="A trained model for analyzing features")
         ...
 
 Both classes reuse the same :code:`FeatureTransform` interface, and in the Scooch :code:`config.yaml` file, we can reuse the same configuration:

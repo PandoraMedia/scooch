@@ -175,7 +175,7 @@ For data augmentations we'll want to parameterize that augmentation itself. Let'
             noise_data = np.random.normal(scale=power_linear, size=sample.shape)
             return sample + noise_data
 
-We can now employ this new :code:`Configurable` inside the :code:`Batcher` class by adding a :code:`ConfigurableParam` in the class definition of :code:`Batcher`, e.g., 
+We can now employ this new :code:`Configurable` inside the :code:`Batcher` class by adding a :code:`Param` with a type of another :code:`Configurable` class, (i.e., the :code:`NoiseAugmenter` class), in the class definition of :code:`Batcher`, e.g., 
 
 .. code-block:: python
 
@@ -192,7 +192,7 @@ We can now employ this new :code:`Configurable` inside the :code:`Batcher` class
 
         _batch_size = Param(int, default=128, doc="The number of samples in each mini-batch")
         _audio_samples_per_smaple = Param(int, default=1024, doc="The number of audio samples to extract each feature from")
-        _augmenter = ConfigurableParam(NoiseAugmenter, doc="An augmentation transformation to be applied to each sample")
+        _augmenter = Param(NoiseAugmenter, doc="An augmentation transformation to be applied to each sample")
 
     ...
 
@@ -270,7 +270,7 @@ Scooch configures not only classes, but class hierarchies. As this codebase deve
             # Produce a random dB value for the noise
             ...
 
-We now adjust the :code:`ConfigurableParam` in the :code:`Batcher` class to refer to any class that derives from :code:`Augmenter`:
+We now adjust the :code:`Configurable` \ :code:`Param` in the :code:`Batcher` class to refer to any class that derives from :code:`Augmenter`:
 
 .. code-block:: python
 
@@ -287,7 +287,7 @@ We now adjust the :code:`ConfigurableParam` in the :code:`Batcher` class to refe
 
         _batch_size = Param(int, default=128, doc="The number of samples in each mini-batch")
         _audio_samples_per_smaple = Param(int, default=1024, doc="The number of audio samples to extract each feature from")
-        _augmenter = ConfigurableParam(Augmenter, doc="An augmentation transformation to be applied to each sample")
+        _augmenter = Param(Augmenter, doc="An augmentation transformation to be applied to each sample")
 
     ...
 
@@ -360,4 +360,4 @@ The structure of configuration for a :code:`Configurable` can become quite compl
 
     scooch construct -c ./default_config.yaml -m batcher -f Batcher
 
-This will prompt for the type of each :code:`ConfigurableParam` in the class hierarchy, and construct a configuration for the :code:`Batcher` class in the :code:`batcher` module and place it in the file :code:`./default_config.yaml`.
+This will prompt for the type of each :code:`Param` that is of type :code:`Configurable` in the class hierarchy, and construct a configuration for the :code:`Batcher` class in the :code:`batcher` module and place it in the file :code:`./default_config.yaml`.

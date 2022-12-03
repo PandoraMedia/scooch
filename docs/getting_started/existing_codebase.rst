@@ -87,19 +87,19 @@ For example, to add all keras loss functions to our Scooch hierarchy we could do
         pass
 
     clsmembers = inspect.getmembers(sys.modules[tf.keras.losses.__name__], inspect.isclass)
-    configurable_tf_losses = [configurize(mem[0], base_class) for mem in clsmembers if mem[0] != 'Loss']
+    configurable_tf_losses = [configurize(mem[0], Loss) for mem in clsmembers if mem[0] != 'Loss']
 
-With the above code, classes can now be defined with a :code:`ConfigurableParam` of type :code:`Loss`, which will now be able to use all keras loss functions in your :code:`config.yaml` file:
+With the above code, classes can now be defined with a :code:`Param` of type :code:`Loss`, which will now be able to use all keras loss functions in your :code:`config.yaml` file:
 
 .. code-block:: python
 
     ...
 
-    from scooch import ConfigurableParam
+    from scooch import Param
 
     class Experiment(Configurable):
 
-        ConfigurableParam(Loss, doc="A Loss function to train a model with.")
+        Param(Loss, doc="A Loss function to train a model with.")
         ...
 
 Configurizing Code that is not Object Oriented
