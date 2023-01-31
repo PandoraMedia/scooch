@@ -140,7 +140,7 @@ class ConfigurableMeta(ABCMeta):
             elif param in list(defaults_dict.keys()):
                 param_value = defaults_dict[param]
                 if '\n' in str(param_value) or len(str(param_value)) > 40:
-                    param_value = f" (Default is of type {type(param_value)})"
+                    default_info = f" (Default is of type {type(param_value)})"
                 else:
                     default_info = f" (Default: {defaults_dict[param]})"
             else:
