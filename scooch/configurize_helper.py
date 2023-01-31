@@ -58,12 +58,12 @@ def configurize(cls=None, base_class=None, init_base_on_construction=True):
             __SCOOCH_NAME__ = 'Scooch' + cls.__name__
 
             # TODO [matt.c.mccallum 11.08.21]: Add type info here
-            _BASE_PARAMS = {param: '<> - Parameter derived by extending base class: {cls.__name__}' for param in inspect.signature(base_cls).parameters.keys()}
-            _BASE_PARAM_DEFAULTS = {param: val.default for param, val in inspect.signature(base_cls).parameters.items()}        
+            _BASE_PARAMS = {param: f'<> - Parameter derived by extending base class: {cls.__name__}' for param in inspect.signature(cls.__init__).parameters.keys()}
+            _BASE_PARAM_DEFAULTS = {param: val.default for param, val in inspect.signature(cls.__init__).parameters.items() if hasattr(val, 'default') and val.default != val.empty}        
             _NAME = base_cls.__name__
 
-            __PARAMS__ = {ky: val for ky, val in _BASE_PARAMS.items() if ky not in ['args', 'kwargs']}
-            __PARAM_DEFAULTS__ = {ky: val for ky, val in _BASE_PARAM_DEFAULTS.items() if ky not in ['args', 'kwargs'] and hasattr(val, 'default') and val.default != val.empty}
+            __PARAMS__ = {ky: val for ky, val in _BASE_PARAMS.items() if ky not in ['self', 'args', 'kwargs']}
+            __PARAM_DEFAULTS__ = {ky: val for ky, val in _BASE_PARAM_DEFAULTS.items() if ky not in ['self', 'args', 'kwargs']}
             
             def __init__(self, cfg=None, *args, **kwargs):
                 """
@@ -99,8 +99,8 @@ def configurize(cls=None, base_class=None, init_base_on_construction=True):
     if base_class is None:
         return configurize_impl(cls)
     elif cls is None:
-        return functools.partial(configurize_impl, base_cls=base_class)
+        return functools.partial(configurize_impl, base_cls=base_class, init_base_on_construction=init_base_on_construction)
     else:
-        return configurize_impl(cls, base_class)
+        return configurize_impl(cls, base_class, init_base_on_construction)
 
 
