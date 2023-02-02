@@ -105,7 +105,7 @@ setuptools.setup(
         'make_reqs': MakeReqsCommand
     },
     name='scooch',
-    version='1.0.1',
+    version='1.0.2',
     description='A python module for configuring hierarchical class structures in yaml with defaults',
     long_description=long_description,
     long_description_content_type="text/markdown",
