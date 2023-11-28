@@ -25,7 +25,7 @@ import functools
 from .configurable import Configurable
 
 
-def configurize(cls=None, base_class=None, init_base_on_construction=True):
+def configurize(cls=None, base_class=None, name_prefix='Scooch', init_base_on_construction=True):
     """
     Takes a class and makes it scooch configurable. This will prepend "Conf" to the class name
     to distinguish it from the class definition. The returned / transformed class will be accessible
@@ -42,7 +42,7 @@ def configurize(cls=None, base_class=None, init_base_on_construction=True):
         class - The augmented Configurable class that may be configured via scooch.
     """
 
-    def configurize_impl(cls, base_cls=None, init_base_on_construction=True):
+    def configurize_impl(cls, base_cls=None, name_prefix='Scooch', init_base_on_construction=True):
 
         # TODO [matt.c.mccallum 11.08.21]: Check the class `cls` is not already `Configurable`
         # TODO [matt.c.mccallum 11.08.21]: Check that `base_cls`` is `Configurable`
@@ -55,7 +55,7 @@ def configurize(cls=None, base_class=None, init_base_on_construction=True):
             """
             """
 
-            __SCOOCH_NAME__ = 'Scooch' + cls.__name__
+            __SCOOCH_NAME__ = name_prefix + cls.__name__
 
             # TODO [matt.c.mccallum 11.08.21]: Add type info here
             _BASE_PARAMS = {param: f'<> - Parameter derived by extending base class: {cls.__name__}' for param in inspect.signature(cls.__init__).parameters.keys()}
@@ -97,10 +97,10 @@ def configurize(cls=None, base_class=None, init_base_on_construction=True):
     if base_class is None and cls is None:
         return None
     if base_class is None:
-        return configurize_impl(cls)
+        return configurize_impl(cls, name_prefix=name_prefix, name_prefix=name_prefix, init_base_on_construction=init_base_on_construction)
     elif cls is None:
-        return functools.partial(configurize_impl, base_cls=base_class, init_base_on_construction=init_base_on_construction)
+        return functools.partial(configurize_impl, base_cls=base_class, name_prefix=name_prefix, init_base_on_construction=init_base_on_construction)
     else:
-        return configurize_impl(cls, base_class, init_base_on_construction)
+        return configurize_impl(cls, base_class, name_prefix, init_base_on_construction)
 
 

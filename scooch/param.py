@@ -84,6 +84,11 @@ class Param:
             owner: Configurable - The class that this Param is a Param of.
         """
         # TODO [matt.c.mccallum 11.04.21]: Make sure owner is of type Configurable
+
+        # If called on the class (i.e., no instance), then return the parameter itself
+        if instance is None:
+            return self
+        # Otherwise return the value
         return instance._config_instances[self._name]
 
     def __set__(self, instance, value):
