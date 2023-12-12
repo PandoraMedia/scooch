@@ -57,6 +57,8 @@ def configurize(cls=None, base_class=None, name_prefix='Scooch', init_base_on_co
 
             __SCOOCH_NAME__ = name_prefix + cls.__name__
 
+            # TODO [matt.c.mccallum 11.29.23]: Add option to exclude / delete parameters here.
+
             # TODO [matt.c.mccallum 11.08.21]: Add type info here
             _BASE_PARAMS = {param: f'<> - Parameter derived by extending base class: {cls.__name__}' for param in inspect.signature(cls.__init__).parameters.keys()}
             _BASE_PARAM_DEFAULTS = {param: val.default for param, val in inspect.signature(cls.__init__).parameters.items() if hasattr(val, 'default') and val.default != val.empty}        
@@ -97,7 +99,7 @@ def configurize(cls=None, base_class=None, name_prefix='Scooch', init_base_on_co
     if base_class is None and cls is None:
         return None
     if base_class is None:
-        return configurize_impl(cls, name_prefix=name_prefix, name_prefix=name_prefix, init_base_on_construction=init_base_on_construction)
+        return configurize_impl(cls, name_prefix=name_prefix, init_base_on_construction=init_base_on_construction)
     elif cls is None:
         return functools.partial(configurize_impl, base_cls=base_class, name_prefix=name_prefix, init_base_on_construction=init_base_on_construction)
     else:
