@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Pandora Media, LLC.
+# Copyright 2023 Pandora Media, LLC.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -47,6 +47,8 @@ class Configurable(object, metaclass=ConfigurableMeta):
 
     __PARAM_DEFAULTS__ = {} # <= Parameters that are optional, and if not provided, will assume default values
 
+    __PARAM_ALIASES__ = {} # <= Parameters that are not configurable, but are derived from other parameter values
+
     def __init__(self, cfg):
         """
         **Constructor.**
@@ -61,7 +63,7 @@ class Configurable(object, metaclass=ConfigurableMeta):
             # Save configuration dictionary
             self._cfg = cfg
 
-        required_config = list(self.__PARAMS__.keys())
+        required_config = [ky for ky in self.__PARAMS__.keys()]
 
         # Populate defaults
         self._populate_defaults_recurse(self._cfg[self.__class__.__name__], self.__PARAM_DEFAULTS__)
@@ -124,14 +126,37 @@ class Configurable(object, metaclass=ConfigurableMeta):
                 cls._populate_defaults_recurse(cfg[field], value)
 
         # Populate the defaults of any Configurables that are also encapsulated within this configurable
-        for key, cfg in cfg.items():
+        for key, cfg_val in cfg.items():
             
             # NOTE [matt.c.mccallum 02.23.22]: Do not populate defaults if there is no class specified (e.g., cfg==None)
-            if key in cls.__CONFIGURABLES__ and cfg is not None:
+            if key in cls.__CONFIGURABLES__ and cfg_val is not None:
                 base_class = cls.__CONFIGURABLES__[key]
                 if inspect.isclass(base_class) and issubclass(base_class, Configurable):
-                    subcls = configurable_factory.get_class(base_class, cfg)
-                    subcls.populate_defaults(cfg)
+                    subcls = configurable_factory.get_class(base_class, cfg_val)
+                    subcls.populate_defaults(cfg_val)
+            
+        # Populate the defaults of any aliases that are also encapsulated within this configurable
+        for key in cls.__PARAM_ALIASES__:
+            cls._assign_aliases(cfg, key)
+
+    @classmethod
+    def _assign_aliases(cls, cfg, alias_name):
+        """
+        Populate the specified alias in the provided config dictionary for this class. Note that if
+        this depends on any other alias parameters, then these in turn will be populated also.
+
+        Args:
+            cfg: dict() - A config dictionary for this class to have aliases populated in.
+
+            alias_name: str - The name of the alias parameter to populate in the provided config 
+            dictionary, based on the parameters that already exist there.
+        """
+        param_transform, transform_args = cls.__PARAM_ALIASES__[alias_name]
+        for arg in transform_args:
+            if arg in cls.__PARAM_ALIASES__ and arg not in cfg:
+                cls._assign_aliases(cfg, arg)
+        args = [cfg[ky] for ky in transform_args]
+        cfg[alias_name] = param_transform(*args)
 
     def _verify_config(self, cfg, template):
         """

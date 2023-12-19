@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Pandora Media, LLC.
+# Copyright 2023 Pandora Media, LLC.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ from abc import ABCMeta
 # Local imports
 from . import ParamDefaults
 from .param import Param
+from .alias_param import AliasParam
 from .config_list import ConfigList
 from .config_collection import ConfigCollection
 
@@ -47,13 +48,10 @@ class ConfigurableMeta(ABCMeta):
             - Translates scooch configuration dictionaries into scooch parameter types and vice versa
             - Updates the class doc string with information on its scooch parameters
         """
-        # Get all base classes that are also ConfigurableMeta types
-        meta_bases = [base for base in bases if type(base) is ConfigurableMeta]
-
-        # Collect all params from base classes\
-        cls._collect_param_from_bases(meta_bases, attrs, '__PARAMS__')
-        cls._collect_param_from_bases(meta_bases, attrs, '__PARAM_DEFAULTS__')
-        cls._collect_param_from_bases(meta_bases, attrs, '__CONFIGURABLES__')
+        if '__PARAMS__' not in attrs: attrs['__PARAMS__'] = {}
+        if '__PARAM_DEFAULTS__' not in attrs: attrs['__PARAM_DEFAULTS__'] = {}
+        if '__CONFIGURABLES__' not in attrs: attrs['__CONFIGURABLES__'] = {}
+        if '__PARAM_ALIASES__' not in attrs: attrs['__PARAM_ALIASES__'] = {}
 
         # Populate dictionaries with any scooch Param classes found on the class.
         for attr_name, value in attrs.items():
@@ -65,10 +63,20 @@ class ConfigurableMeta(ABCMeta):
                 # Populate __PARAM_DEFAULTS__
                 if value.default != ParamDefaults.NO_DEFAULT:
                     attrs['__PARAM_DEFAULTS__'][attr_name.lstrip('_')] = value.default
-
                 if isinstance(value.type, (ConfigurableMeta, ConfigList, ConfigCollection)):
                     # Add to __CONFIGURABLES__
                     attrs['__CONFIGURABLES__'][attr_name.lstrip('_')] = value.type
+                if isinstance(value, AliasParam):
+                    attrs['__PARAM_ALIASES__'][attr_name.lstrip('_')] = (value._transform_function, value._source_param_names)
+
+        # Get all base classes that are also ConfigurableMeta types
+        meta_bases = [base for base in bases if type(base) is ConfigurableMeta]
+        # Collect all params from base classes, excluding those that are overridden in this class.
+        exclude_keys = set(attrs['__PARAMS__'].keys())
+        cls._collect_param_from_bases(meta_bases, attrs, '__PARAMS__', exclude_keys)
+        cls._collect_param_from_bases(meta_bases, attrs, '__PARAM_DEFAULTS__', exclude_keys)
+        cls._collect_param_from_bases(meta_bases, attrs, '__CONFIGURABLES__', exclude_keys)
+        cls._collect_param_from_bases(meta_bases, attrs, '__PARAM_ALIASES__', exclude_keys)
 
         # Check that no params have numeric names - this can happen with private variables, e.g., '_0' is a valid variable name in python.
         for attr_name in attrs['__PARAMS__']:
@@ -78,7 +86,14 @@ class ConfigurableMeta(ABCMeta):
         # Create Param attributes that don't already exist from the scooch Configurable dictionaries
         for attr_name in attrs['__PARAMS__']:
             if '_'+attr_name not in attrs and attr_name not in attrs:
-                if attr_name in attrs['__CONFIGURABLES__']:
+                if attr_name in attrs['__PARAM_ALIASES__']:
+                    attrs['_'+attr_name] = AliasParam(
+                        None, # NOTE [matt.c.mccallum 12.18.23]: Currently no way to infer type from the older __PARAM__ class dictionaries. We may address this in the future.
+                        attrs['__PARAM_ALIASES__'][attr_name][1],
+                        attrs['__PARAM_ALIASES__'][attr_name][0],
+                        attrs['__PARAMS__'][attr_name]
+                    )
+                elif attr_name in attrs['__CONFIGURABLES__']:
                     attrs['_'+attr_name] = Param(
                         attrs['__CONFIGURABLES__'][attr_name], 
                         attrs['__PARAM_DEFAULTS__'].get(attr_name, ParamDefaults.NO_DEFAULT), 
@@ -99,6 +114,13 @@ class ConfigurableMeta(ABCMeta):
         # Rename the class if programmatically defined
         if '__SCOOCH_NAME__' in attrs and attrs['__SCOOCH_NAME__'] is not None:
             name = attrs['__SCOOCH_NAME__']
+
+        # Finally, make sure the aliase parameter arguments exist in the class parameters
+        for attr_name, value in attrs.items():
+            if isinstance(value, AliasParam):
+                for arg in value._source_param_names:
+                    if arg not in attrs['__PARAMS__']:
+                        raise AttributeError(f"A parameter was configured to be an alias of the parameter '{arg}', which does not exist for class {name}")
 
         return super(ConfigurableMeta, cls).__new__(cls, name, bases, attrs)
 
@@ -153,7 +175,7 @@ class ConfigurableMeta(ABCMeta):
         return class_doc
 
     @staticmethod
-    def _collect_param_from_bases(meta_bases, attrs, param_name):
+    def _collect_param_from_bases(meta_bases, attrs, param_name, exclude_keys):
         """
         Collects a parameter from the attributes of all the provided base classes.
 
@@ -164,11 +186,15 @@ class ConfigurableMeta(ABCMeta):
             attrs: dict - A dictionary of all attributes for this class that inherits the provided bases.
 
             param_name: str - The name of the parameter to collect across all provided base classes.
+
+            exclude_keys: set(str) - A set of keys to exclude collecting into `attrs` from `meta_bases`.
         """
         # Reverse list here to respect the python method resolution order (MRO) in any comprehension statements.
         meta_bases = meta_bases[::-1]
         # Collect the params.
-        params = {k:v for base in meta_bases for k, v in base.__dict__[param_name].items()}
+        params = {k:v for base in meta_bases for k, v in base.__dict__[param_name].items() if k not in exclude_keys}
         if param_name in attrs.keys():
+            # NOTE [matt.c.mccallum 12.18.23]: The later argument will take precedence here, 
+            #      ensuring that the provided `attr`'s override those in `meta_bases`.
             params = {**params, **attrs[param_name]}
         attrs[param_name] = params
