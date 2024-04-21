@@ -71,7 +71,7 @@ the [documentation](http://www.mattcmccallum.com/scooch/docs).
 
 
 REQUIRED_PACKAGES = [
-    'pyyaml==5.4.1',
+    'pyyaml==6.0.1',
     'sphinx',
     'sphinx_rtd_theme==0.5.1',
     'ruamel.yaml==0.16.12',
