@@ -75,7 +75,7 @@ REQUIRED_PACKAGES = [
     'sphinx',
     'sphinx_rtd_theme==0.5.1',
     'ruamel.yaml==0.16.12',
-    'click==8.0.0a1'
+    'click==8.1.7'
 ]
 
 class MakeReqsCommand(distutils.cmd.Command):
@@ -105,7 +105,7 @@ setuptools.setup(
         'make_reqs': MakeReqsCommand
     },
     name='scooch',
-    version='1.0.3',
+    version='1.0.4',
     description='A python module for configuring hierarchical class structures in yaml with defaults',
     long_description=long_description,
     long_description_content_type="text/markdown",
