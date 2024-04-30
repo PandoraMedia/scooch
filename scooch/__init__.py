@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Pandora Media, LLC.
+# Copyright 2023 Pandora Media, LLC.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,6 +26,7 @@ from .config_list import *
 from .config_collection import *
 from .config_factory import *
 from .param import Param
+from .alias_param import AliasParam
 from .configurable_factory import ConfigurableFactory
 
 # TODO [matt.c.mccallum 01.05.21]: Remove the two below in favor of the config factory, once legacy codebases are updated.
