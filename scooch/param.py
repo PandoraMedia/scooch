@@ -101,4 +101,22 @@ class Param:
 
             value: object - The value to change the config item to.
         """
-        instance._config_instances[self._name] = value
+        # If alias, raise error.
+        if self._name in instance.__PARAM_ALIASES__:
+            raise ValueError(f"Attempted to change the value of the '{self._name}' parameter, which is an alias and is not settable.")
+        # If configurable, gotta construct it populate defaults.
+        if self._name in instance.__CONFIGURABLES__:
+            if isinstance(value, (dict,)):
+                obj = instance._config_factory.construct(instance.__CONFIGURABLES__[self._name], value)
+            elif not isinstance(value, (Configurable, None)):
+                raise ValueError(f"Attempted to set parameter of type Configurable with object other than (dict, Config, Configurable or None)")
+            instance._config_instances[self._name] = obj
+        else:
+            # TODO [mmccallum 05.07.24]: Add type checking here.
+            instance._config_instances[self._name] = value    
+
+        # Update config dictionary:
+        instance._cfg[self._name] = value
+
+        # Update aliases:
+        instance.update_aliases()

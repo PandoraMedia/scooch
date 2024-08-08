@@ -136,6 +136,17 @@ class Configurable(object, metaclass=ConfigurableMeta):
                     subcls.populate_defaults(cfg_val)
             
         # Populate the defaults of any aliases that are also encapsulated within this configurable
+        cls._update_aliases(cfg)
+
+    def update_aliases(self):
+        """
+        """
+        self._update_aliases(self._cfg)
+    
+    @classmethod
+    def _update_aliases(cls, cfg):
+        """
+        """
         for key in cls.__PARAM_ALIASES__:
             cls._assign_aliases(cfg, key)
 
