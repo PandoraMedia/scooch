@@ -116,7 +116,7 @@ class Param:
             instance._config_instances[self._name] = value    
 
         # Update config dictionary:
-        instance._cfg[self._name] = value
+        instance._cfg[instance.__class__.__name__][self._name] = value
 
         # Update aliases:
         instance.update_aliases()
